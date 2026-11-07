@@ -1,0 +1,6 @@
+target/
+.verification/
+.idea/
+*.iml
+artifacts/
+dist/

@@ -1,0 +1,5 @@
+name: '星锻强化材料'
+namespace: 'starforge'
+author: 'Local server'
+version: '1.0.0'
+description: 'StarForge 四种强化材料，使用由插件校验与消耗'

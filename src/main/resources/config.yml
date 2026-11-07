@@ -1,0 +1,12 @@
+schema-version: 1
+# 修改上限时同时在 levels.yml 补齐每一级。
+max-level: 15
+# 每次连续失败增加 3 个百分点，成功重置，绑定武器 PDC。
+pity-per-failure: 0.03
+lucky-bonus: 0.10
+announce-level: 11
+# 唯一生效路径：asterstats / vanilla / api。星芽短剑使用 asterstats。
+attribute-backend: 'asterstats'
+
+# 仅指向CE资源目录的规则文件；材料name/lore/模型在CE的configuration/items.yml维护。
+materials-file: '../CraftEngine/resources/强化石/starforge-materials.yml'

@@ -1,0 +1,123 @@
+schema-version: 1
+# 等级键为本次目标等级；成长逐级累加，percent 使用小数，如 0.05=5%。
+levels:
+  1:
+    chance: 1.000
+    money: 100.0
+    material: 'stone'
+    amount: 1
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.0
+  2:
+    chance: 0.945
+    money: 200.0
+    material: 'intermediate_stone'
+    amount: 1
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.0
+  3:
+    chance: 0.890
+    money: 300.0
+    material: 'intermediate_stone'
+    amount: 1
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.0
+  4:
+    chance: 0.835
+    money: 400.0
+    material: 'intermediate_stone'
+    amount: 2
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.0
+  5:
+    chance: 0.780
+    money: 500.0
+    material: 'intermediate_stone'
+    amount: 2
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.0
+  6:
+    chance: 0.725
+    money: 600.0
+    material: 'intermediate_stone'
+    amount: 2
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.0
+  7:
+    chance: 0.670
+    money: 700.0
+    material: 'intermediate_stone'
+    amount: 3
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.0
+  8:
+    chance: 0.615
+    money: 800.0
+    material: 'intermediate_stone'
+    amount: 3
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.0
+  9:
+    chance: 0.560
+    money: 900.0
+    material: 'intermediate_stone'
+    amount: 3
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.0
+  10:
+    chance: 0.505
+    money: 1000.0
+    material: 'intermediate_stone'
+    amount: 4
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.0
+  11:
+    chance: 0.450
+    money: 1100.0
+    material: 'advanced_stone'
+    amount: 4
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.35
+  12:
+    chance: 0.395
+    money: 1200.0
+    material: 'advanced_stone'
+    amount: 4
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.35
+  13:
+    chance: 0.340
+    money: 1300.0
+    material: 'advanced_stone'
+    amount: 5
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.35
+  14:
+    chance: 0.285
+    money: 1400.0
+    material: 'advanced_stone'
+    amount: 5
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.35
+  15:
+    chance: 0.230
+    money: 1500.0
+    material: 'advanced_stone'
+    amount: 5
+    attack-flat: 0.20
+    attack-percent: 0.05
+    downgrade-chance: 0.35

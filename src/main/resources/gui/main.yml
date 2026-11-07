@@ -1,0 +1,63 @@
+schema-version: 1
+# S 放强化石，W 放单件武器。L/P 切换背包中的符文。
+background-image: 'starforge:forge_menu'
+title: '<font:starforge:ui><#F1E9FF>星锻强化</font>'
+
+shape:
+  - 'FFFFFFFFF'
+  - 'FFFSSSFFF'
+  - 'FWFSSSFCF'
+  - 'FFFSSSFFF'
+  - 'FFFLFPFXF'
+
+elements:
+  F:
+    material: 'AIR'
+    name: ''
+    action: 'none'
+
+  S:
+    material: 'AIR'
+    action: 'stone'
+
+  W:
+    material: 'AIR'
+    action: 'weapon'
+
+  L:
+    material: 'AIR'
+    craft-engine: 'lucky'
+    action: 'lucky'
+    toggle-lore:
+      - '<#FDE68A>左键切换本次是否使用幸运符。'
+
+  P:
+    material: 'AIR'
+    craft-engine: 'protect'
+    action: 'protect'
+    toggle-lore:
+      - '<#67E8F9>左键切换本次是否使用保护符。'
+
+  C:
+    material: 'AIR'
+    pixel-button: true
+    name: '<#4ADE80>✦ <bold>确认强化</bold>'
+    lore:
+      - ''
+      - '<#94A3B8>左侧放单件武器，中间九格可混放强化石。'
+      - '<#94A3B8>每次消耗槽内全部强化石，成功率最高 100%。'
+      - '<#CBD5E1>攻击力 <#F8FAFC>{current} <#64748B>→ <#4ADE80>{next-attack}'
+      - '<#64748B> ├ <#CBD5E1>当前成功率: <#FDE047><bold>{chance}%</bold>'
+      - '<#64748B> ├ <#CBD5E1>消耗金币: <#FBBF24>{money}'
+      - '<#64748B> ╰ <#CBD5E1>强化石数量: <#F8FAFC>{materials}'
+      - ''
+      - '<#86EFAC>▶ 点击立即开始星锻强化'
+    action: 'forge'
+
+  X:
+    material: 'AIR'
+    pixel-button: true
+    name: '<#F87171>✕ <bold>关闭菜单</bold>'
+    lore:
+      - '<#94A3B8>点击退出当前强化界面'
+    action: 'close'

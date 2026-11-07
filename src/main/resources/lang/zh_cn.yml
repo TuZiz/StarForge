@@ -1,0 +1,52 @@
+schema-version: 1
+
+# ─── 基础与权限提示 ───
+no-permission: '<#64748B>[ <#F87171>✕ <#64748B>] <#FCA5A5>权限不足，无法执行该操作。'
+player-only: '<#64748B>[ <#FBBF24>⚠ <#64748B>] <#FDE68A>该指令仅限游戏内玩家执行。'
+offline: '<#64748B>[ <#FBBF24>⚠ <#64748B>] <#FDE68A>目标玩家当前不在线。'
+
+# ─── 帮助指令 ───
+help: '<#64748B>[ <#60A5FA>✦ <#64748B>] <#E2E8F0>输入 <#93C5FD>/sf <#E2E8F0>打开强化菜单 <#94A3B8>(在槽位放入单件武器和强化石)'
+admin-help: '<#64748B>[ <#C084FC>⚙ <#64748B>] <#E2E8F0>管理指令: <#C084FC>/sf <#93C5FD>admin <#64748B>| <#93C5FD>give 玩家 材料 [数量] <#64748B>| <#93C5FD>set 等级 <#64748B>| <#93C5FD>bind 材料 <#64748B>| <#93C5FD>mark on [标记] / mark off <#64748B>| <#93C5FD>reload'
+
+# ─── 状态与限制提示 ───
+changed: '<#64748B>[ <#FBBF24>⚠ <#64748B>] <#FDE68A>检测到主手武器已更换，请重新打开强化菜单。'
+not-weapon: '<#64748B>[ <#FBBF24>⚠ <#64748B>] <#FDE68A>请主手持有单件剑、斧或带攻击属性的自定义武器；黑名单物品无法强化。'
+weapon-marked: '<#64748B>[ <#4ADE80>✔ <#64748B>] <#86EFAC>已更新主手物品的可强化标记，武器黑名单仍然生效。'
+max: '<#64748B>[ <#FDE047>★ <#64748B>] <#FEF08A>该武器已达到 <#FDE047><bold>最高强化上限</bold><#FEF08A>！'
+materials-missing: '<#64748B>[ <#FBBF24>⚠ <#64748B>] <#FDE68A>强化所需材料或所选符文数量不足。'
+money-missing: '<#64748B>[ <#FBBF24>⚠ <#64748B>] <#FDE68A>金币余额不足，或经济系统拒绝扣费。'
+stone-unavailable: '<#64748B>[ <#FBBF24>⚠ <#64748B>] <#FDE68A>当前强化石不适用于该等级，请检查适用范围。'
+material-unavailable: '<#64748B>[ <#FBBF24>⚠ <#64748B>] <#FDE68A>强化材料尚未就绪。'
+
+# ─── 系统异常提示 ───
+backend-missing: '<#64748B>[ <#F87171>✕ <#64748B>] <#FCA5A5>属性系统未就绪，强化功能已临时暂停。'
+economy-missing: '<#64748B>[ <#F87171>✕ <#64748B>] <#FCA5A5>经济系统未就绪，本次操作未扣除任何材料。'
+error: '<#64748B>[ <#F87171>✕ <#64748B>] <#FCA5A5>操作发生异常！请联系管理员核对日志，<#F87171><underlined>请勿立即重复操作</underlined><#FCA5A5>。'
+
+# ─── 强化结果反馈 ───
+success: '<#64748B>[ <#4ADE80>✔ <#64748B>] <#86EFAC>恭喜！武器<#4ADE80><bold>强化成功</bold><#86EFAC>！'
+failed: '<#64748B>[ <#FBBF24>✦ <#64748B>] <#FDE68A>强化失败，武器等级保持不变，<#93C5FD>保底进度已增加<#FDE68A>。'
+downgraded: '<#64748B>[ <#FB923C>▼ <#64748B>] <#FDBA74>强化失败！武器等级 <#FB923C>降低 1 级<#FDBA74>，装备本体已保留。'
+
+# ─── 屏幕标题 (Title) 与全服播报 ───
+success-title: '<#93C5FD>✦ <gradient:#60A5FA:#C084FC><bold>强化成功</bold></gradient> <#C084FC>✦'
+failed-title: '<#FBBF24>❖ <gradient:#FBBF24:#F87171><bold>强化未成功</bold></gradient> <#F87171>❖'
+result-title: '<#94A3B8>当前强化等级 <#FDE047><bold>+{level}</bold>'
+announce: '<#64748B>[ <#C084FC>✦ <#64748B>] <#E2E8F0>天降祥瑞！玩家 <#93C5FD>{player} <#E2E8F0>成功将武器强化至 <#FDE047><bold>+{level}</bold> <#E2E8F0>！'
+
+# ─── 物品 Lore 与后缀显示 ───
+level-suffix: ' <#FDE047>✦ +{level}'
+weapon-line: '<#60A5FA>◈ 强化等级 <#FDE047>+{level} <#64748B>│ <#CBD5E1>攻击力 <#F8FAFC>{base} <#4ADE80>+{bonus} <#64748B>➜ <#FDE047>{total}'
+weapon-attack-suffix: ' <#4ADE80>(+{bonus})'
+weapon-bonus-line: '<#CBD5E1>攻击力 <#4ADE80>+{bonus}'
+option-enabled: '<#4ADE80>● 已启用'
+option-disabled: '<#64748B>○ 未启用'
+
+# ─── 管理员与物品发放反馈 ───
+reload-requested: '<#64748B>[ <#60A5FA>✦ <#64748B>] <#BFDBFE>已提交异步重载请求，请留意控制台输出结果。'
+bound: '<#64748B>[ <#4ADE80>✔ <#64748B>] <#86EFAC>主手材料已标记，请在 CE 资源目录的 <#FDE047>starforge-materials.yml <#86EFAC>配置 <#93C5FD>binding <#86EFAC>来源。'
+set-success: '<#64748B>[ <#4ADE80>✔ <#64748B>] <#86EFAC>已成功设置主手武器等级，并重置保底进度。'
+received: '<#64748B>[ <#4ADE80>✔ <#64748B>] <#86EFAC>已获得强化材料 <#94A3B8>(若背包已满将掉落在脚下)<#86EFAC>。'
+
+insert-weapon: '<#FDE68A>请先把单件武器放入左侧槽位。'

@@ -1,0 +1,7 @@
+schema-version: 1
+images:
+  starforge:forge_menu:
+    height: 110
+    ascent: 13
+    font: minecraft:default
+    file: starforge:font/gui/forge_menu.png

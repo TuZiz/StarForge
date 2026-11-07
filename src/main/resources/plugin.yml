@@ -1,0 +1,25 @@
+name: StarForge
+version: '1.0.0'
+main: ym.starforge.StarForge
+api-version: '26.2'
+folia-supported: true
+authors:
+  - 'ym'
+softdepend:
+  - 'Vault'
+  - 'PlaceholderAPI'
+  - 'CraftEngine'
+  - 'ItemHub'
+  - 'AsterStats'
+commands:
+  starforge:
+    description: '武器强化与管理'
+    aliases:
+      - 'sf'
+permissions:
+  starforge.use:
+    description: '使用强化菜单、幸运符与保护符'
+    default: true
+  starforge.admin:
+    description: '管理菜单、发放材料、绑定、武器标记、设置等级和重载'
+    default: op

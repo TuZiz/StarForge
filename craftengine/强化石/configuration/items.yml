@@ -1,0 +1,78 @@
+schema-version: 1
+items:
+  starforge:stone:
+    material: paper
+    texture: starforge:item/stone
+    data:
+      item_name: '<gradient:#60A5FA:#93C5FD>初级强化石</gradient>'
+      lore:
+        - '<#CBD5E1>用于武器强化的基础材料'
+        - ''
+        - '<#94A3B8>适用等级：<#FFFFFF>全部强化等级'
+        - '<#94A3B8>强化效果：<#FFFFFF>提升 1 级'
+        - '<#94A3B8>单颗概率：<#FDE047>以锻造台配置为准，可混放叠加'
+        - ''
+        - '<#CBD5E1>前往铁匠铺，在锻造台强化武器'
+        - '<#93C5FD>输入 /锻造台 或 /warp dzt 前往'
+        - '<#94A3B8>放入锻造台的强化石槽，成功率最高 100%'
+  starforge:intermediate_stone:
+    material: paper
+    texture: starforge:item/intermediate_stone
+    data:
+      item_name: '<gradient:#22D3EE:#A5F3FC>中级强化石</gradient>'
+      lore:
+        - '<#CBD5E1>用于武器强化的进阶材料'
+        - ''
+        - '<#94A3B8>适用等级：<#FFFFFF>全部强化等级'
+        - '<#94A3B8>强化效果：<#FFFFFF>提升 1 级'
+        - '<#94A3B8>单颗概率：<#FDE047>以锻造台配置为准，可混放叠加'
+        - ''
+        - '<#CBD5E1>前往铁匠铺，在锻造台强化武器'
+        - '<#93C5FD>输入 /锻造台 或 /warp dzt 前往'
+        - '<#94A3B8>放入锻造台的强化石槽，成功率最高 100%'
+  starforge:advanced_stone:
+    material: paper
+    texture: starforge:item/advanced_stone
+    data:
+      item_name: '<gradient:#A78BFA:#DDD6FE>高级强化石</gradient>'
+      lore:
+        - '<#CBD5E1>用于高阶武器强化的珍贵材料'
+        - ''
+        - '<#94A3B8>适用等级：<#FFFFFF>全部强化等级'
+        - '<#94A3B8>强化效果：<#FFFFFF>提升 1 级'
+        - '<#94A3B8>单颗概率：<#FDE047>以锻造台配置为准，可混放叠加'
+        - ''
+        - '<#CBD5E1>前往铁匠铺，在锻造台强化武器'
+        - '<#93C5FD>输入 /锻造台 或 /warp dzt 前往'
+        - '<#94A3B8>放入锻造台的强化石槽，成功率最高 100%'
+  starforge:lucky:
+    material: paper
+    texture: starforge:item/lucky
+    data:
+      item_name: '<gradient:#FBBF24:#FEF08A>幸运符</gradient>'
+      lore:
+        - '<#CBD5E1>强化武器时提高本次成功率'
+        - '<#94A3B8>在锻造台点击启用，额外消耗一张'
+        - '<#94A3B8>实际成功率以锻造台显示为准'
+        - ''
+        - '<#CBD5E1>前往铁匠铺，在锻造台强化武器'
+        - '<#93C5FD>输入 /锻造台 或 /warp dzt 前往'
+        - '<#94A3B8>材料放在背包中即可，无需手动放入'
+  starforge:protect:
+    material: paper
+    texture: starforge:item/protect
+    data:
+      item_name: '<gradient:#2DD4BF:#99F6E4>保护符</gradient>'
+      lore:
+        - '<#CBD5E1>防止本次强化失败造成等级下降'
+        - '<#94A3B8>在锻造台点击启用，额外消耗一张'
+        - '<#FDE047>不保证强化成功，装备永不销毁'
+        - ''
+        - '<#CBD5E1>前往铁匠铺，在锻造台强化武器'
+        - '<#93C5FD>输入 /锻造台 或 /warp dzt 前往'
+        - '<#94A3B8>材料放在背包中即可，无需手动放入'
+  starforge:gui_blank:
+    material: paper
+    texture: starforge:item/gui_blank
+    data:
+      item_name: ''

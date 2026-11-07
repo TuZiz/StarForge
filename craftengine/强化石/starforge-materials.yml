@@ -1,0 +1,22 @@
+schema-version: 1
+# 省略 min-target/max-target 时全等级通用。chance 为单颗概率，混放时累加。
+materials:
+  stone:
+    craft-engine: 'starforge:stone'
+    enhancement:
+      steps: 1
+      chance: 0.1
+  intermediate_stone:
+    craft-engine: 'starforge:intermediate_stone'
+    enhancement:
+      steps: 1
+      chance: 0.2
+  advanced_stone:
+    craft-engine: 'starforge:advanced_stone'
+    enhancement:
+      steps: 1
+      chance: 0.35
+  lucky:
+    craft-engine: 'starforge:lucky'
+  protect:
+    craft-engine: 'starforge:protect'

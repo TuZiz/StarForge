@@ -1,0 +1,18 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>ym</groupId><artifactId>StarForge</artifactId><version>1.0.0</version>
+  <properties><maven.compiler.release>25</maven.compiler.release><project.build.sourceEncoding>UTF-8</project.build.sourceEncoding><vault.jar>C:/Users/32633/Desktop/leaf/plugins/Vault.jar</vault.jar><papi.jar>C:/Users/32633/Desktop/leaf/plugins/PlaceholderAPI-2.12.3.jar</papi.jar><ce.jar>C:/Users/32633/Desktop/leaf/plugins/craft-engine-paper-plugin-26.9.2.jar</ce.jar><itemhub.jar>D:/codex/ItemHub/target/ItemHub-1.0-SNAPSHOT.jar</itemhub.jar></properties>
+  <repositories><repository><id>papermc</id><url>https://repo.papermc.io/repository/maven-public/</url></repository></repositories>
+  <dependencies>
+    <dependency><groupId>io.papermc.paper</groupId><artifactId>paper-api</artifactId><version>26.2.build.121-stable</version><scope>provided</scope></dependency>
+    <dependency><groupId>local</groupId><artifactId>vault</artifactId><version>1</version><scope>system</scope><systemPath>${vault.jar}</systemPath></dependency>
+    <dependency><groupId>local</groupId><artifactId>papi</artifactId><version>1</version><scope>system</scope><systemPath>${papi.jar}</systemPath></dependency>
+    <dependency><groupId>local</groupId><artifactId>ce</artifactId><version>26.9.2</version><scope>system</scope><systemPath>${ce.jar}</systemPath></dependency>
+    <dependency><groupId>local</groupId><artifactId>itemhub</artifactId><version>1</version><scope>system</scope><systemPath>${itemhub.jar}</systemPath></dependency>
+    <dependency><groupId>org.junit.jupiter</groupId><artifactId>junit-jupiter</artifactId><version>5.12.2</version><scope>test</scope></dependency>
+  </dependencies>
+  <build><plugins>
+    <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-compiler-plugin</artifactId><version>3.13.0</version></plugin>
+    <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-surefire-plugin</artifactId><version>3.5.3</version></plugin>
+  </plugins></build>
+</project>

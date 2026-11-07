@@ -1,0 +1,50 @@
+schema-version: 1
+title: '<#C084FC>星锻 · 管理'
+shape:
+  - 'FFFFFFFFF'
+  - 'FASDLPBFF'
+  - 'FFMFRFFFF'
+  - 'FFFFXFFFF'
+elements:
+  F:
+    material: 'GRAY_STAINED_GLASS_PANE'
+    name: ''
+    action: 'none'
+  A:
+    material: 'ANVIL'
+    name: '<#93C5FD>打开玩家强化菜单'
+    action: 'player-menu'
+  S:
+    material: 'LAPIS_LAZULI'
+    name: '<#60A5FA>发放 16 个强化石'
+    action: 'give-stone'
+  D:
+    material: 'AMETHYST_SHARD'
+    name: '<#C084FC>发放 16 个高级强化石'
+    action: 'give-advanced'
+  L:
+    material: 'GOLD_NUGGET'
+    name: '<#FDE047>发放幸运符'
+    action: 'give-lucky'
+  P:
+    material: 'SHIELD'
+    name: '<#67E8F9>发放保护符'
+    action: 'give-protect'
+  B:
+    material: 'NAME_TAG'
+    name: '<#CBD5E1>标记主手为绑定强化石'
+    lore:
+      - '<#94A3B8>需要材料配置使用 binding 来源'
+    action: 'bind'
+  M:
+    material: 'DIAMOND'
+    name: '<#67E8F9>发放 16 个中级强化石'
+    action: 'give-intermediate'
+  R:
+    material: 'CLOCK'
+    name: '<#93C5FD>异步重载'
+    action: 'reload'
+  X:
+    material: 'BARRIER'
+    name: '<#F87171>关闭'
+    action: 'close'

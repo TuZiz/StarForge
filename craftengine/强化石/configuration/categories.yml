@@ -1,0 +1,12 @@
+# CraftEngine物品分类；不展示内部透明GUI模型。
+schema-version: 1
+categories:
+  starforge:materials:
+    name: '<gradient:#60A5FA:#C084FC>强化材料</gradient>'
+    icon: starforge:stone
+    list:
+      - starforge:stone
+      - starforge:intermediate_stone
+      - starforge:advanced_stone
+      - starforge:lucky
+      - starforge:protect

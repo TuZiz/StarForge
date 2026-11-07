@@ -1,0 +1,20 @@
+schema-version: 2
+# 攻击属性行末尾追加强化收益；没有匹配行时仅显示一条简短加成。
+lore:
+  attack-line-pattern: '^.*(?:攻击力|攻击伤害)\s*(?:»|:|：)?\s*\+?\d+(?:\.\d+)?\s*$'
+# 默认允许原版剑、斧与具备主手攻击属性的 ItemHub / AsterStats 武器。
+# 本文件仅覆盖特殊规则，无需登记每把武器；删除以下示例条目仍可强化星芽短剑。
+# 每项只能选 itemhub / vanilla / marker 一种；任意命中的 blacklist 优先拒绝。
+# marker 对应 /sf mark on <中文标记> 写入的标记，不能绕过黑名单。
+weapons:
+  星芽短剑:
+    itemhub: '星芽:短剑'
+    blacklist: false
+    max-level: 15
+    growth-multiplier: 1.0
+    # 可选 levels 按目标等级覆盖 chance / money / material / amount /
+    # attack-flat / attack-percent / downgrade-chance；省略字段继承 levels.yml。
+    # levels:
+    #   2:
+    #     money: 150.0
+    #     attack-percent: 0.06

@@ -8,7 +8,7 @@ shape:
   - 'FFFSSSFFF'
   - 'FWFSSSFCF'
   - 'FFFSSSFFF'
-  - 'FFFLFPFXF'
+  - 'FFLFFFPXF'
 
 elements:
   F:
@@ -45,11 +45,11 @@ elements:
     lore:
       - ''
       - '<#94A3B8>左侧放单件武器，中间九格可混放强化石。'
-      - '<#94A3B8>每次消耗槽内全部强化石，成功率最高 100%。'
+      - '<#94A3B8>按槽位顺序扣石，达到 100% 后返还多余的石头。'
       - '<#CBD5E1>攻击力 <#F8FAFC>{current} <#64748B>→ <#4ADE80>{next-attack}'
       - '<#64748B> ├ <#CBD5E1>当前成功率: <#FDE047><bold>{chance}%</bold>'
       - '<#64748B> ├ <#CBD5E1>消耗金币: <#FBBF24>{money}'
-      - '<#64748B> ╰ <#CBD5E1>强化石数量: <#F8FAFC>{materials}'
+      - '<#64748B> ╰ <#CBD5E1>放入 <#F8FAFC>{stones-loaded} <#CBD5E1>· 实扣 <#FDE047>{materials} <#CBD5E1>· 返还 <#86EFAC>{stones-returned}'
       - ''
       - '<#86EFAC>▶ 点击立即开始星锻强化'
     action: 'forge'

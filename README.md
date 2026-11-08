@@ -96,3 +96,13 @@ StarForge 的数据目录和发行 JAR 不再存 materials.yml，不保存材料
 CE configuration/categories.yml 新增“强化材料”分类，列出初级/中级/高级强化石、幸运符、保护符，隐藏内部透明模型。该分类沿用服务器“货币”的CE分类语法；不是新增一种StarForge item来源类型。旧的CE分散定义已备份后合并到items.yml，避免重复ID。
 
 五种材料均写明前往铁匠铺，输入 /锻造台 或 /warp dzt，材料留在背包无需手动放入。这里只提供已有传送指令的使用说明，不注册或修改这些指令，也不会让右键材料自动传送。材料规则加载错误包含外部文件路径和字段，失败保留旧快照；不会自动恢复旧材料配置。
+
+## 耗时锻造
+
+`/sf craft` 打开像素锻造菜单，权限为 `starforge.use`。选择配方并确认后从背包扣除材料及金币，开始计时。点击「配方 / 我的锻造」查看每件订单的百分比、剩余秒数与领取状态。完成后点击订单领取，背包不足时保留订单。
+
+`recipes.yml` 配置材料、金币、产物和 `duration-seconds`（制作耗时，秒）。`source` 支持 `vanilla`、`craft-engine`、`itemhub`，使用对应物品 ID。原版材料严格匹配无额外元数据物品。示例铁剑配方为 8 个 CE 初级强化石（starforge:stone）、2 个 CE 中级强化石（starforge:intermediate_stone）、100 金币、60 秒，产出 1 把原版铁剑，正式经济数值请按服务器调整。同配方每玩家一单，`cooldown-group` 非空时组内共用制作位置，领取后可再次提交。不同配方默认可同时制作。
+
+订单保存在 `crafting-orders.yml`，离线和重启期间继续计时，产物使用提交时快照，已删除配方的订单仍可从我的锻造领取。文件读写异步执行。`prepared`、`claiming` 表示处理中，重启后遇到这两种状态需管理员核对玩家背包和经济记录，避免自动重试造成重复发放。Vault、玩家存档和订单文件无跨系统原子事务，崩溃窗口仍需人工核对。
+
+已有安装需显式添加 `recipes.yml` 与 `gui/crafting.yml`，不会自动补回缺失资源。新背景为 CE `starforge:crafting_menu`，来源 `craftengine/强化石/configuration/gui-images.yml` 与 `resourcepack/assets/starforge/textures/font/gui/crafting_menu.png`。部署后需要执行 CE workflow 并让客户端接受资源包，才能验收实际对齐。

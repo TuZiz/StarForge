@@ -1,0 +1,21 @@
+schema-version: 1
+# duration-seconds 为制作耗时（秒），离线和重启期间继续计时。
+# 同配方同时一单，cooldown-group 非空时组内共用一个制作位置，领取后释放。
+# 产物在提交时保存快照，修改配方不影响已有订单。
+recipes:
+  iron_sword:
+    name: '<#FBBF24>铁剑锻造'
+    money: 100
+    duration-seconds: 60
+    cooldown-group: ''
+    ingredients:
+      - source: 'craft-engine'
+        id: 'starforge:stone'
+        amount: 8
+      - source: 'craft-engine'
+        id: 'starforge:intermediate_stone'
+        amount: 2
+    result:
+      source: 'vanilla'
+      id: 'IRON_SWORD'
+      amount: 1

@@ -5,3 +5,8 @@ images:
     ascent: 13
     font: minecraft:default
     file: starforge:font/gui/forge_menu.png
+  starforge:crafting_menu:
+    height: 110
+    ascent: 13
+    font: minecraft:default
+    file: starforge:font/gui/crafting_menu.png

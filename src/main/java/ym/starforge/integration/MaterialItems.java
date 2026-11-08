@@ -28,13 +28,13 @@ public final class MaterialItems {
         if(s.binding()!=null)item.editMeta(m->m.getPersistentDataContainer().set(ForgeData.MATERIAL,PersistentDataType.STRING,s.binding()));
         return item;
     }
-    public Map<String,Integer> countStones(Collection<ItemStack> stacks,String preferred){
+    public List<Map.Entry<String,Integer>> describeStoneStacks(Collection<ItemStack> stacks,String preferred){
         var ids=settings.get().materials().keySet().stream()
                 .filter(id->!id.equals("lucky")&&!id.equals("protect")).sorted().toList();
-        Map<String,Integer> counts=new LinkedHashMap<>();
+        List<Map.Entry<String,Integer>> counts=new ArrayList<>();
         for(ItemStack stack:stacks){
             String id=matches(stack,preferred)?preferred:ids.stream().filter(key->matches(stack,key)).findFirst().orElse("");
-            counts.merge(id,stack.getAmount(),Integer::sum);
+            counts.add(Map.entry(id,stack.getAmount()));
         }
         return counts;
     }

@@ -12,10 +12,12 @@ import ym.starforge.text.Texts;
 import java.util.*;
 
 public final class ForgeCommand implements CommandExecutor,TabCompleter {
+    private final java.util.function.Consumer<Player> crafting;
     private final Plugin plugin;private final ForgeMenus menus;private final MaterialItems materials;private final WeaponService weapons;private final Texts texts;private final Runnable reload;private final java.util.function.IntSupplier max;
-    public ForgeCommand(Plugin p,ForgeMenus g,MaterialItems m,WeaponService w,Texts t,Runnable r,java.util.function.IntSupplier x){plugin=p;menus=g;materials=m;weapons=w;texts=t;reload=r;max=x;}
+    public ForgeCommand(Plugin p,ForgeMenus g,MaterialItems m,WeaponService w,Texts t,Runnable r,java.util.function.IntSupplier x,java.util.function.Consumer<Player> crafting){this.crafting=crafting;plugin=p;menus=g;materials=m;weapons=w;texts=t;reload=r;max=x;}
     public boolean onCommand(CommandSender s,Command c,String label,String[] a){
         if(a.length==0){if(s instanceof Player p)menus.open(p,false,false,false);else texts.send(s,"player-only");return true;}
+        if(a[0].equalsIgnoreCase("craft")){if(!s.hasPermission("starforge.use"))texts.send(s,"no-permission");else if(a.length!=1)texts.send(s,"help");else if(s instanceof Player p)crafting.accept(p);else texts.send(s,"player-only");return true;}
         if(a.length==1&&a[0].equalsIgnoreCase("help")){texts.send(s,s.hasPermission("starforge.admin")?"admin-help":"help");return true;}
         if(!s.hasPermission("starforge.admin")){texts.send(s,"no-permission");return true;}
         try{switch(a[0].toLowerCase(Locale.ROOT)){
@@ -28,5 +30,5 @@ public final class ForgeCommand implements CommandExecutor,TabCompleter {
             default -> texts.send(s,"admin-help");
         }}catch(IllegalArgumentException ex){texts.send(s,"admin-help");}return true;
     }
-    public List<String> onTabComplete(CommandSender s,Command c,String label,String[] a){if(!s.hasPermission("starforge.use")&&!s.hasPermission("starforge.admin"))return List.of();List<String> values=a.length==1?(s.hasPermission("starforge.admin")?List.of("help","admin","give","set","bind","mark","reload"):List.of("help")):!s.hasPermission("starforge.admin")?List.of():a.length==2&&a[0].equals("mark")?List.of("on","off"):a.length==2&&a[0].equals("give")?Bukkit.getOnlinePlayers().stream().map(Player::getName).toList():a.length==2&&a[0].equals("bind")||a.length==3&&a[0].equals("give")?List.of("stone","intermediate_stone","advanced_stone","lucky","protect"):List.of();return values.stream().filter(v->v.startsWith(a[a.length-1])).toList();}
+    public List<String> onTabComplete(CommandSender s,Command c,String label,String[] a){if(!s.hasPermission("starforge.use")&&!s.hasPermission("starforge.admin"))return List.of();List<String> values=a.length==1?(s.hasPermission("starforge.admin")?List.of("craft","help","admin","give","set","bind","mark","reload"):List.of("craft","help")):!s.hasPermission("starforge.admin")?List.of():a.length==2&&a[0].equals("mark")?List.of("on","off"):a.length==2&&a[0].equals("give")?Bukkit.getOnlinePlayers().stream().map(Player::getName).toList():a.length==2&&a[0].equals("bind")||a.length==3&&a[0].equals("give")?List.of("stone","intermediate_stone","advanced_stone","lucky","protect"):List.of();return values.stream().filter(v->v.startsWith(a[a.length-1])).toList();}
 }

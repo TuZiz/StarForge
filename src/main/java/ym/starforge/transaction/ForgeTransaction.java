@@ -24,12 +24,17 @@ public final class ForgeTransaction {
     private final Map<UUID,Long> cooldown=new ConcurrentHashMap<>();
     public ForgeTransaction(Plugin p,Supplier<ForgeSettings> c,WeaponService w,MaterialItems m,Texts t,OperationLog l){plugin=p;config=c;weapons=w;materials=m;texts=t;log=l;}
     public void execute(Player player,ItemStack expected,boolean lucky,boolean protect){
-        execute(player,expected,lucky,protect,null,-1,List.of());
+        execute(player,expected,lucky,protect,null,-1,List.of(),()->{});
     }
     public void execute(Player player,Inventory inputs,int weaponSlot,List<Integer> stoneSlots,boolean lucky,boolean protect){
-        execute(player,null,lucky,protect,inputs,weaponSlot,stoneSlots);
+        execute(player,inputs,weaponSlot,stoneSlots,lucky,protect,()->{});
     }
-    private void execute(Player player,ItemStack expected,boolean lucky,boolean protect,Inventory inputs,int weaponSlot,List<Integer> stoneSlots){
+    public void execute(Player player,Inventory inputs,int weaponSlot,List<Integer> stoneSlots,
+                        boolean lucky,boolean protect,Runnable beforeResult){
+        execute(player,null,lucky,protect,inputs,weaponSlot,stoneSlots,beforeResult);
+    }
+    private void execute(Player player,ItemStack expected,boolean lucky,boolean protect,Inventory inputs,
+                         int weaponSlot,List<Integer> stoneSlots,Runnable beforeResult){
         UUID uid=player.getUniqueId();long now=System.nanoTime();
         if(!busy.add(uid))return;
         try {
@@ -41,25 +46,26 @@ public final class ForgeTransaction {
             if((inputs==null&&!original.equals(expected))||weapons.match(original)==null){texts.send(player,"changed");return;}
             original=original.clone();
             var stones=inputs==null?Map.<Integer,ItemStack>of():snapshotStones(inputs,stoneSlots);
-            int stoneCount=stones.values().stream().mapToInt(ItemStack::getAmount).sum();
             var cfg=config.get();var rule=weapons.match(original);int old=weapons.level(original);if(old>=rule.max(cfg.max())){texts.send(player,"max");return;}
             if(cfg.backend().equals("asterstats")&&!Bukkit.getPluginManager().isPluginEnabled("AsterStats")){texts.send(player,"backend-missing");return;}
-            var basePlan=ForgePlan.prepare(cfg,rule,old,weapons.failures(original),lucky);
+            ItemStack[] before=cloneContents(player.getInventory().getStorageContents()),after=cloneContents(before);
+            int hand=inputs==null?player.getInventory().getHeldItemSlot():-1;
+            boolean useLucky=lucky&&take(after,"lucky",1,hand);
+            boolean useProtect=protect&&take(after,"protect",1,hand);
+            var basePlan=ForgePlan.prepare(cfg,rule,old,weapons.failures(original),useLucky);
             if(basePlan==null){texts.send(player,"stone-unavailable");return;}
-            var plan=inputs==null?basePlan:basePlan.withStones(cfg,rule,old,weapons.failures(original),lucky,
-                    materials.countStones(stones.values(),basePlan.material()));
+            var plan=inputs==null?basePlan:basePlan.withStones(cfg,rule,old,weapons.failures(original),useLucky,
+                    materials.describeStoneStacks(stones.values(),basePlan.material()));
             if(plan==null){texts.send(player,"materials-missing");return;}
             if(plan.money()>0&&!Bukkit.getPluginManager().isPluginEnabled("Vault")){texts.send(player,"economy-missing");return;}
             Economy economy=Bukkit.getPluginManager().isPluginEnabled("Vault")?Bukkit.getServicesManager().load(Economy.class):null;
             if(plan.money()>0&&economy==null){texts.send(player,"economy-missing");return;}
-            ItemStack[] before=cloneContents(player.getInventory().getStorageContents()),after=cloneContents(before);
-            int hand=inputs==null?player.getInventory().getHeldItemSlot():-1;
-            if((inputs==null&&!take(after,plan.material(),plan.amount(),hand))||(lucky&&!take(after,"lucky",1,hand))||(protect&&!take(after,"protect",1,hand))){texts.send(player,"materials-missing");return;}
-            var roll=ForgeRoll.resolveTarget(old,plan.target(),weapons.failures(original),plan.chance(),plan.downgrade(),protect,java.util.concurrent.ThreadLocalRandom.current().nextDouble(),java.util.concurrent.ThreadLocalRandom.current().nextDouble());
+            if(inputs==null&&!take(after,plan.material(),plan.amount(),hand)){texts.send(player,"materials-missing");return;}
+            var roll=ForgeRoll.resolveTarget(old,plan.target(),weapons.failures(original),plan.chance(),plan.downgrade(),useProtect,java.util.concurrent.ThreadLocalRandom.current().nextDouble(),java.util.concurrent.ThreadLocalRandom.current().nextDouble());
             boolean success=roll.success(),down=roll.downgraded();int result=roll.level();
             ItemStack target=original.clone();ForgeData.write(target,result,success?0:Math.min(1000000,weapons.failures(original)+1));target=weapons.refresh(target);if(inputs==null)after[hand]=target;
             String tx=UUID.randomUUID().toString();boolean paid=false,writing=false,writingInputs=false;
-            log.record("PREPARED tx="+tx+" player="+uid+" old="+old+" new="+result+" money="+plan.money()+" stones="+(inputs==null?plan.amount():stoneCount));
+            log.record("PREPARED tx="+tx+" player="+uid+" old="+old+" new="+result+" money="+plan.money()+" stones="+plan.amount());
             try {
                 if(plan.money()>0){EconomyResponse response=economy.withdrawPlayer(player,plan.money());if(!response.transactionSuccess()){texts.send(player,"money-missing");log.record("DECLINED tx="+tx+" reason="+response.errorMessage);return;}paid=true;}
                 // Re-entrant economy hooks must not have changed any storage slot or configuration.
@@ -70,7 +76,16 @@ public final class ForgeTransaction {
                 if(inputs!=null){
                     writingInputs=true;
                     inputs.setItem(weaponSlot,target);
-                    stones.keySet().forEach(slot->inputs.setItem(slot,null));
+                    int remaining=plan.amount();
+                    for(var entry:stones.entrySet()){
+                        if(remaining==0)break;
+                        var stack=entry.getValue();
+                        int used=Math.min(remaining,stack.getAmount());
+                        var leftover=stack.clone();
+                        leftover.setAmount(stack.getAmount()-used);
+                        inputs.setItem(entry.getKey(),leftover.getAmount()==0?null:leftover);
+                        remaining-=used;
+                    }
                 }
                 log.record("COMMITTED tx="+tx+" player="+uid+" result="+(success?"SUCCESS":down?"DOWNGRADE":"FAIL")+" weapon="+target.getPersistentDataContainer().get(ForgeData.UID,org.bukkit.persistence.PersistentDataType.STRING));
             } catch(Exception ex) {
@@ -82,6 +97,7 @@ public final class ForgeTransaction {
                 log.record("ROLLED_BACK tx="+tx+" unchanged="+unchanged);
                 plugin.getLogger().log(Level.SEVERE,"Forge transaction failed player="+uid+" tx="+tx+"; inspect account/inventory if rollback incomplete",ex);texts.send(player,"error");return;
             }
+            beforeResult.run();
             texts.send(player,success?"success":down?"downgraded":"failed");
             player.playSound(player.getLocation(),success?Sound.BLOCK_ANVIL_USE:Sound.BLOCK_ANVIL_LAND,1,success?1.3f:0.7f);
             player.spawnParticle(success?Particle.ENCHANT:Particle.SMOKE,player.getLocation().add(0,1,0),20,0.4,0.4,0.4,0.1);

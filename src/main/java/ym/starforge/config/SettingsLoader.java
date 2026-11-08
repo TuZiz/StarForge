@@ -15,7 +15,7 @@ public final class SettingsLoader {
         File root=plugin.getDataFolder();
         if (!root.exists()) {
             Files.createDirectories(root.toPath());
-            for (String file:List.of("config.yml","levels.yml","weapons.yml","lang/zh_cn.yml","gui/main.yml","gui/admin.yml")) plugin.saveResource(file,false);
+            for (String file:List.of("config.yml","levels.yml","weapons.yml","lang/zh_cn.yml","gui/main.yml","gui/admin.yml","recipes.yml","gui/crafting.yml")) plugin.saveResource(file,false);
         }
         var c=read("config.yml"); var l=read("levels.yml"); var w=read("weapons.yml"); var lang=read("lang/zh_cn.yml");
         int max=c.getInt("max-level"); check(max>=1 && max<=100,"config.yml:max-level",max);

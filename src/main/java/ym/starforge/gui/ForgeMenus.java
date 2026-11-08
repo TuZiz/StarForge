@@ -35,11 +35,11 @@ public final class ForgeMenus implements Listener,AutoCloseable {
         var rows=y.getStringList("shape");
         var title=ym.starforge.integration.MenuArt.title(Texts.parse(y.getString("title"),Map.of("level","0")),y.getString("background-image"));
         holder.inventory=Bukkit.createInventory(holder,rows.size()*9,title);
-        paint(holder);
+        paint(p,holder);
         p.openInventory(holder.inventory);
         viewers.put(p.getUniqueId(),p);
     }
-    private void paint(Holder holder){
+    private void paint(Player player,Holder holder){
         var cfg=holder.revision;
         boolean lucky=holder.lucky,protect=holder.protect;
         ItemStack item=holder.weaponSlot<0?null:holder.inventory.getItem(holder.weaponSlot);
@@ -50,10 +50,13 @@ public final class ForgeMenus implements Listener,AutoCloseable {
         var stones=ForgeTransaction.snapshotStones(holder.inventory,holder.stoneSlots);
         int stoneCount=stones.values().stream().mapToInt(ItemStack::getAmount).sum();
         var materials=new MaterialItems(()->cfg);
+        var storage=player.getInventory().getStorageContents();
+        boolean useLucky=lucky&&Arrays.stream(storage).anyMatch(stack->materials.matches(stack,"lucky"));
+        boolean useProtect=protect&&Arrays.stream(storage).anyMatch(stack->materials.matches(stack,"protect"));
         int current=weapons.level(item),target=Math.max(1,Math.min(rule.max(cfg.max()),current+1));
-        var plan=ForgePlan.prepare(cfg,rule,current,weapons.failures(item),lucky);
-        var mixedPlan=hasWeapon&&plan!=null?plan.withStones(cfg,rule,current,weapons.failures(item),lucky,
-                materials.countStones(stones.values(),plan.material())):null;
+        var plan=ForgePlan.prepare(cfg,rule,current,weapons.failures(item),useLucky);
+        var mixedPlan=hasWeapon&&plan!=null?plan.withStones(cfg,rule,current,weapons.failures(item),useLucky,
+                materials.describeStoneStacks(stones.values(),plan.material())):null;
         boolean validStones=mixedPlan!=null;
         if(validStones)plan=mixedPlan;
         var level=rule.level(target,cfg.levels());double base=weapons.base(item);
@@ -67,7 +70,10 @@ public final class ForgeMenus implements Listener,AutoCloseable {
         double chance=validStones?plan.chance():0;
         values.put("chance",WeaponService.fmt(chance==1?100:Math.min(99.99,Math.floor(chance*10000)/100)));
         values.put("money",WeaponService.fmt(plan==null?0:plan.money()));
-        values.put("materials",(validStones?stoneCount:plan==null?0:plan.amount())+"");
+        int consumed=validStones?plan.amount():0;
+        values.put("materials",Integer.toString(consumed));
+        values.put("stones-loaded",Integer.toString(stoneCount));
+        values.put("stones-returned",Integer.toString(stoneCount-consumed));
         values.put("current",WeaponService.fmt(base+weapons.bonus(item,base,current)));
         values.put("next-attack",WeaponService.fmt(base+weapons.bonus(item,base,target)));
         values.put("max-level",""+rule.max(cfg.max()));
@@ -97,7 +103,9 @@ public final class ForgeMenus implements Listener,AutoCloseable {
                         var lore=new ArrayList<net.kyori.adventure.text.Component>();
                         if(scrollMeta.lore()!=null)lore.addAll(scrollMeta.lore());
                         lore.add(net.kyori.adventure.text.Component.empty());
-                        lore.add(texts.get(enabled?"option-enabled":"option-disabled",Map.of()));
+                        boolean available=action.equals("lucky")?useLucky:useProtect;
+                        String status=!enabled?"option-disabled":available?"option-enabled":"option-waiting";
+                        lore.add(texts.get(status,Map.of()));
                         button.getStringList("toggle-lore").forEach(line->lore.add(Texts.parse(line,values)));
                         scrollMeta.lore(lore.stream().map(Texts::plainStyle).toList());
                         scrollMeta.setEnchantmentGlintOverride(enabled);
@@ -114,6 +122,7 @@ public final class ForgeMenus implements Listener,AutoCloseable {
             int slot=event.getRawSlot();
             if((event.getClick()==ClickType.LEFT||event.getClick()==ClickType.RIGHT)&&slot>=h.inventory.getSize()&&slot<event.getView().countSlots()){
                 event.setCancelled(false);
+                repaint(p,h);
                 return;
             }
             if(isInput(h,slot)&&(event.getClick()==ClickType.LEFT||event.getClick()==ClickType.RIGHT)){
@@ -144,11 +153,16 @@ public final class ForgeMenus implements Listener,AutoCloseable {
                             ||!Objects.equals(expectedStones,ForgeTransaction.snapshotStones(h.inventory,h.stoneSlots))){
                         texts.send(p,"changed");return;
                     }
-                    transaction.execute(p,h.inventory,h.weaponSlot,h.stoneSlots,h.lucky,h.protect);
-                    if(p.getOpenInventory().getTopInventory()==h.inventory)paint(h);
+                    transaction.execute(p,h.inventory,h.weaponSlot,h.stoneSlots,h.lucky,h.protect,
+                            ()->reopenAfterResult(p,h));
+                    if(p.getOpenInventory().getTopInventory()==h.inventory)paint(p,h);
                 }
-                case "lucky" -> {h.lucky=!h.lucky;paint(h);}
-                case "protect" -> {h.protect=!h.protect;paint(h);}
+                case "lucky", "protect" -> {
+                    boolean enabled=action.equals("lucky")?h.lucky:h.protect;
+                    if(action.equals("lucky"))h.lucky=!enabled;
+                    else h.protect=!enabled;
+                    paint(p,h);
+                }
                 case "player-menu" -> open(p,false,false,false);
                 case "reload" -> p.performCommand("starforge reload");
                 case "give-stone" -> p.performCommand("starforge give "+p.getName()+" stone 16");
@@ -159,6 +173,19 @@ public final class ForgeMenus implements Listener,AutoCloseable {
                 case "bind" -> p.performCommand("starforge bind stone");
             }
         },null,1);
+    }
+    private void reopenAfterResult(Player player,Holder holder){
+        if(player.getOpenInventory().getTopInventory()!=holder.inventory)return;
+        player.closeInventory();
+        var closedView=player.getOpenInventory().getTopInventory();
+        if(closedView.getType()!=InventoryType.CRAFTING)return;
+        player.getScheduler().execute(plugin,()->{
+            if(plugin.isEnabled()&&player.isOnline()&&settings.get()==holder.revision
+                    &&player.hasPermission("starforge.use")
+                    &&player.getOpenInventory().getTopInventory()==closedView){
+                open(player,false,holder.lucky,holder.protect);
+            }
+        },null,30);
     }
     private static ItemStack copy(ItemStack item){return item==null?null:item.clone();}
     private boolean isInput(Holder h,int slot){return slot>=0&&(slot==h.weaponSlot||h.stoneSlots.contains(slot));}
@@ -171,7 +198,7 @@ public final class ForgeMenus implements Listener,AutoCloseable {
     }
     private void repaint(Player player,Holder h){
         player.getScheduler().execute(plugin,()->{
-            if(player.getOpenInventory().getTopInventory()==h.inventory&&settings.get()==h.revision)paint(h);
+            if(player.getOpenInventory().getTopInventory()==h.inventory&&settings.get()==h.revision)paint(player,h);
         },null,1);
     }
     @EventHandler(ignoreCancelled=true) public void drag(InventoryDragEvent event){

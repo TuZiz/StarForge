@@ -53,16 +53,20 @@ class StoneTierTest {
         var mixed=new ForgeSettings(15,cfg.pity(),cfg.lucky(),11,"api",cfg.levels(),specs,Map.of(),Map.of(),null,null);
         var weapon=ForgeSettings.defaults();
         var plan=ForgePlan.prepare(mixed,weapon,0,0,false);
-        assertEquals(.4,plan.withStones(mixed,weapon,0,0,false,Map.of("stone",2,"intermediate_stone",1)).chance(),1e-8);
-        assertEquals(1,plan.withStones(mixed,weapon,0,0,false,Map.of("intermediate_stone",10)).chance());
-        assertNull(plan.withStones(mixed,weapon,0,0,false,Map.of("advanced_stone",1)));
+        assertEquals(.4,plan.withStones(mixed,weapon,0,0,false,List.of(Map.entry("stone",2),Map.entry("intermediate_stone",1))).chance(),1e-8);
+        var capped=plan.withStones(mixed,weapon,0,0,false,List.of(Map.entry("stone",64)));
+        assertEquals(1,capped.chance());
+        assertEquals(10,capped.amount());
+        assertEquals(9,plan.withStones(mixed,weapon,0,0,true,List.of(Map.entry("stone",64))).amount());
+        assertEquals(6,plan.withStones(mixed,weapon,0,0,false,List.of(Map.entry("intermediate_stone",4),Map.entry("stone",64))).amount());
+        assertNull(plan.withStones(mixed,weapon,0,0,false,List.of(Map.entry("advanced_stone",1))));
     }
     @Test void defaultMenuSeparatesWeaponStonesAndScrollButtons()throws Exception{
         var y=new YamlConfiguration();try(var r=new InputStreamReader(getClass().getResourceAsStream("/gui/main.yml"),java.nio.charset.StandardCharsets.UTF_8)){y.load(r);}
         var shape=String.join("",y.getStringList("shape"));
         assertEquals(19,shape.indexOf('W'));
-        assertEquals(39,shape.indexOf('L'));
-        assertEquals(41,shape.indexOf('P'));
+        assertEquals(38,shape.indexOf('L'));
+        assertEquals(42,shape.indexOf('P'));
         assertEquals(25,shape.indexOf('C'));
         assertEquals(List.of(12,13,14,21,22,23,30,31,32),java.util.stream.IntStream.range(0,shape.length())
                 .filter(i->shape.charAt(i)=='S').boxed().toList());

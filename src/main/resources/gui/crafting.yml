@@ -1,0 +1,50 @@
+schema-version: 1
+title: '<font:starforge:ui><#F1E9FF>星锻工坊</font>'
+background-image: 'starforge:crafting_menu'
+ingredient-line: '<#CBD5E1>{material} <#FBBF24>{owned}/{required}'
+# 框中心按真实箱子槽位对齐：x=16+18×列，y=26+18×行。
+# 配方位于行1～3、列1～3，成品位于行2、列7。
+# 底部操作列为0/2/4/6/8，中心y=98。
+shape:
+  - 'FFFFFFFFF'
+  - 'FRRRFFFFF'
+  - 'FRRRFFFOF'
+  - 'FRRRFFFFF'
+  - 'BFTFCFNFX'
+elements:
+  F:
+    material: 'AIR'
+    name: ''
+    action: 'none'
+  R:
+    action: 'recipe'
+    lore:
+      - '<#FBBF24>金币 {money}'
+      - '<#CBD5E1>状态 {state}'
+      - '<#67E8F9>制作进度 {progress}% · 剩余 {seconds} 秒'
+      - '<#94A3B8>点击选择，制作记录中点击领取成品'
+  O:
+    action: 'result'
+    lore:
+      - '<#FBBF24>金币 {money}'
+      - '<#67E8F9>进度 {progress}% · 剩余 {seconds} 秒'
+  B:
+    action: 'previous'
+    name: '<#FBBF24>上一页'
+  N:
+    action: 'next'
+    name: '<#FBBF24>下一页'
+  T:
+    action: 'progress'
+    name: '<#67E8F9>配方 / 我的锻造'
+    lore:
+      - '<#CBD5E1>切换查看全部制作记录'
+  C:
+    action: 'confirm'
+    name: '<#86EFAC>开始锻造 / 领取成品'
+    lore:
+      - '<#CBD5E1>{state} · {progress}%'
+      - '<#FBBF24>剩余 {seconds} 秒'
+  X:
+    action: 'close'
+    name: '<#F87171>关闭'

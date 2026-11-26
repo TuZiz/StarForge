@@ -9,6 +9,8 @@ public interface StarForgeApi {
     int level(ItemStack item);
     int failures(ItemStack item);
     Map<String, Double> contribution(ItemStack item, Map<String, Double> latestBase);
+    /** Wearing-slot-aware bridge. Legacy providers remain mainhand-only. */
+    default Map<String,Double> contribution(ItemStack item,String slot,Map<String,Double> latestBase){return "mainhand".equals(slot)?contribution(item,latestBase):Map.of();}
     /** Detached, idempotent rebuild. No inventory writes or economy operations. */
     ItemStack refresh(ItemStack item);
     /** Pure original-item view, excludes only precisely recorded StarForge presentation and modifiers. */

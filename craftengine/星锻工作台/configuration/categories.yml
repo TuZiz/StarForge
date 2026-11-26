@@ -1,0 +1,8 @@
+schema-version: 1
+categories:
+  starforge:workstations:
+    name: '<#D9B488>星锻工作台'
+    icon: 'starforge:enhancement_station'
+    list:
+      - 'starforge:enhancement_station'
+      - 'starforge:crafting_station'

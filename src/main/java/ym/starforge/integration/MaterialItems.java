@@ -38,6 +38,14 @@ public final class MaterialItems {
         }
         return counts;
     }
+    /** Storage only: one stack is assigned to the first matching selected ID, never double-counted. */
+    public Map<String,Integer> countSelected(ItemStack[] storage,Collection<String> ids){
+        Map<String,Integer> result=new LinkedHashMap<>();ids.forEach(id->result.put(id,0));
+        for(ItemStack item:storage)for(String id:ids)if(matches(item,id)){
+            result.merge(id,item.getAmount(),Integer::sum);break;
+        }
+        return result;
+    }
     public net.kyori.adventure.text.Component displayName(String id){
         var item=create(id);var meta=item.getItemMeta();
         var name=meta.customName();

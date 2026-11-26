@@ -1,0 +1,57 @@
+schema-version: 1
+background-image: 'starforge:craft_orders_six'
+title: '<font:starforge:ui><#EAD6AF>    我的锻造 {used}/{limit}</font>'
+# 两层各三个物品位；G 在对应 J 正下方，显示独立进度条和百分比。
+# 功能按钮可用 craft-engine: '命名空间:物品ID'；或用 material 配置原版材质。
+shape:
+  - 'FJFFJFFJF'
+  - 'FGFFGFFGF'
+  - 'FJFFJFFJF'
+  - 'FGFFGFFGF'
+  - 'FFFPBNFFF'
+elements:
+  F:
+    action: 'none'
+  J:
+    empty-name: '<#94A3B8>空闲锻造位'
+    locked-name: '<#94A3B8>未开放锻造位'
+    action: 'order'
+    empty-craft-engine: 'starforge:craft_slot_empty'
+    locked-craft-engine: 'starforge:craft_slot_locked'
+    lore:
+      - ''
+      - '<#CBD5E1>{state} · 本单产出 {amount} 件'
+      - '<#67E8F9>进度 {progress}% · 剩余 {seconds} 秒'
+      - '<#86EFAC>完成后点击物品或进度条领取'
+  G:
+    name: '<#86EFAC>锻造进度 · {progress}%'
+    empty-name: '<#94A3B8>空闲'
+    locked-name: '<#94A3B8>未开放'
+    pending-name: '<#EAD6AF>处理中'
+    action: 'progress'
+    craft-engine-prefix: 'starforge:craft_progress_'
+    pending-craft-engine: 'starforge:craft_progress_pending'
+    empty-craft-engine: 'starforge:craft_progress_empty'
+    locked-craft-engine: 'starforge:craft_progress_locked'
+    lore:
+      - '<#CBD5E1>{state}'
+      - '<#67E8F9>进度 {progress}% · 剩余 {seconds} 秒'
+      - '<#86EFAC>完成后点击领取这一单'
+  B:
+    name: '<#EAD6AF>返回配方'
+    action: 'back'
+    craft-engine: 'starforge:gui_blank'
+    lore:
+      - '<#FBBF24>返回配方'
+  P:
+    name: '<#EAD6AF>上一页'
+    action: 'previous'
+    craft-engine: 'starforge:craft_nav_previous'
+    lore:
+      - '<#FBBF24>上一页 · {page}/{pages}'
+  N:
+    name: '<#EAD6AF>下一页'
+    action: 'next'
+    craft-engine: 'starforge:craft_nav_next'
+    lore:
+      - '<#FBBF24>下一页 · {page}/{pages}'

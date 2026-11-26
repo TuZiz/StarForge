@@ -20,17 +20,20 @@ public final class CraftingDelivery {
         this.plugin = plugin; this.orders = orders; this.texts = texts;
     }
     public void claim(Player player, CraftingJob job, BooleanSupplier valid, Runnable repaint) {
+        claim(player,job,valid,item->{},repaint);
+    }
+    public void claim(Player player, CraftingJob job, BooleanSupplier valid,java.util.function.Consumer<ItemStack> onClaim,Runnable repaint) {
         UUID id = player.getUniqueId();
         if (!job.key().startsWith(id + "/") || !player.hasPermission("starforge.use") || !busy.add(id)) return;
         if (!job.state().equals("running") || job.remaining() > 0) { busy.remove(id); return; }
         orders.beginClaim(job).whenComplete((reserved, error) -> {
             if (error != null) { report(id, error); busy.remove(id); return; }
             if (!plugin.isEnabled()) { busy.remove(id); return; }
-            boolean scheduled = player.getScheduler().execute(plugin, () -> deliver(player, job, valid, repaint), () -> restore(id, job), 1);
+            boolean scheduled = player.getScheduler().execute(plugin, () -> deliver(player, job, valid, onClaim,repaint), () -> restore(id, job), 1);
             if (!scheduled) restore(id, job);
         });
     }
-    private void deliver(Player player, CraftingJob job, BooleanSupplier valid, Runnable repaint) {
+    private void deliver(Player player, CraftingJob job, BooleanSupplier valid,java.util.function.Consumer<ItemStack> onClaim,Runnable repaint) {
         UUID id = player.getUniqueId();
         if (!plugin.isEnabled() || !player.isOnline() || !player.hasPermission("starforge.use") || !valid.getAsBoolean()) { restore(id, job); return; }
         try {
@@ -39,8 +42,17 @@ public final class CraftingDelivery {
             if (!CraftingTransaction.insert(after, item, job.amount())) { texts.send(player, "crafting-space"); restore(id, job); return; }
             // Once applying begins, uncertain failures retain claiming for operator inspection.
             player.getInventory().setStorageContents(after);
-            orders.complete(job).whenComplete((v, error) -> { if (error != null) report(id, error); busy.remove(id); });
-            texts.send(player, "crafting-claimed"); repaint.run();
+            orders.complete(job).whenComplete((v, error) -> {
+                if (error != null) report(id, error);
+                busy.remove(id);
+                if (plugin.isEnabled()) player.getScheduler().execute(plugin, () -> {
+                    if (!player.isOnline()) return;
+                    texts.send(player, error == null ? "crafting-claimed" : "error");
+                    if(error==null&&valid.getAsBoolean())try{onClaim.accept(item.clone());}
+                    catch(RuntimeException visual){plugin.getLogger().log(Level.WARNING,"Crafting claim visual failed player="+id+" job="+job.key(),visual);}
+                    if (valid.getAsBoolean()) repaint.run();
+                }, null, 1);
+            });
         } catch (Exception ex) { report(id, ex); busy.remove(id); texts.send(player, "error"); }
     }
     private void restore(UUID id, CraftingJob job) {

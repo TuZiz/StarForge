@@ -1,0 +1,25 @@
+schema-version: 1
+namespace: '星锻测试'
+# 产物由 ItemHub 生成，属性由 AsterStats 按主手读取。Lore 仅展示。
+试作长剑:
+  category: '武器'
+  material: 'DIAMOND_SWORD'
+  remove-default-attack-damage: true
+  display:
+    name: '<gradient:#FBBF24:#FDE68A>试作星辉长剑</gradient>'
+    lore:
+      - '<#94A3B8>星锻工坊制作的试作武器'
+      - ''
+      - '<#FBBF24>攻击力 » +12'
+      - '<#FDE68A>暴击几率 » +5%'
+      - '<#DDD6FE>暴击伤害 » +50%'
+      - ''
+      - '<#67E8F9>主手持有时生效'
+  integrations:
+    asterstats:
+      slots:
+        - 'mainhand'
+      stats:
+        attack: 12.0
+        crit_chance: 0.05
+        crit_damage: 0.5

@@ -1,5 +1,9 @@
 schema-version: 1
 # 等级键为本次目标等级；成长逐级累加，percent 使用小数，如 0.05=5%。
+# attack-* 只用于武器；defense-* 只用于防具。旧文件缺防御字段时内存默认每级 +0.20 与基础防御的 5%。
+# stone-chances 为单颗成功率贡献，按目标等级覆盖材料默认值。
+# required-stone 至少实扣一颗，计入最低颗数。空字符串表示无指定材料。
+# downgrade-chance 和 crack-chance 只在失败时判定，两种结果互斥。
 levels:
   1:
     chance: 1.000
@@ -8,7 +12,13 @@ levels:
     amount: 1
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.0
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.00
+    stone-chances:
+      stone: 0.25 # 初级强化石
+      intermediate_stone: 0.35 # 中级强化石
+      advanced_stone: 0.45 # 高级强化石
   2:
     chance: 0.945
     money: 200.0
@@ -16,7 +26,13 @@ levels:
     amount: 1
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.0
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.00
+    stone-chances:
+      stone: 0.25 # 初级强化石
+      intermediate_stone: 0.35 # 中级强化石
+      advanced_stone: 0.45 # 高级强化石
   3:
     chance: 0.890
     money: 300.0
@@ -24,7 +40,13 @@ levels:
     amount: 1
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.0
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.00
+    stone-chances:
+      stone: 0.25 # 初级强化石
+      intermediate_stone: 0.35 # 中级强化石
+      advanced_stone: 0.45 # 高级强化石
   4:
     chance: 0.835
     money: 400.0
@@ -32,7 +54,13 @@ levels:
     amount: 2
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.0
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.00
+    stone-chances:
+      stone: 0.12 # 初级强化石
+      intermediate_stone: 0.24 # 中级强化石
+      advanced_stone: 0.35 # 高级强化石
   5:
     chance: 0.780
     money: 500.0
@@ -40,7 +68,13 @@ levels:
     amount: 2
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.0
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.00
+    stone-chances:
+      stone: 0.12 # 初级强化石
+      intermediate_stone: 0.24 # 中级强化石
+      advanced_stone: 0.35 # 高级强化石
   6:
     chance: 0.725
     money: 600.0
@@ -48,7 +82,13 @@ levels:
     amount: 2
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.0
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.00
+    stone-chances:
+      stone: 0.12 # 初级强化石
+      intermediate_stone: 0.24 # 中级强化石
+      advanced_stone: 0.35 # 高级强化石
   7:
     chance: 0.670
     money: 700.0
@@ -56,7 +96,13 @@ levels:
     amount: 3
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.0
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.00
+    stone-chances:
+      stone: 0.05 # 初级强化石
+      intermediate_stone: 0.14 # 中级强化石
+      advanced_stone: 0.25 # 高级强化石
   8:
     chance: 0.615
     money: 800.0
@@ -64,7 +110,13 @@ levels:
     amount: 3
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.0
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.00
+    stone-chances:
+      stone: 0.05 # 初级强化石
+      intermediate_stone: 0.14 # 中级强化石
+      advanced_stone: 0.25 # 高级强化石
   9:
     chance: 0.560
     money: 900.0
@@ -72,7 +124,13 @@ levels:
     amount: 3
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.0
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.00
+    stone-chances:
+      stone: 0.05 # 初级强化石
+      intermediate_stone: 0.14 # 中级强化石
+      advanced_stone: 0.25 # 高级强化石
   10:
     chance: 0.505
     money: 1000.0
@@ -80,7 +138,13 @@ levels:
     amount: 4
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.0
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.00
+    stone-chances:
+      stone: 0.05 # 初级强化石
+      intermediate_stone: 0.14 # 中级强化石
+      advanced_stone: 0.25 # 高级强化石
   11:
     chance: 0.450
     money: 1100.0
@@ -88,7 +152,14 @@ levels:
     amount: 4
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.35
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.20
+    stone-chances:
+      stone: 0.02 # 初级强化石
+      intermediate_stone: 0.08 # 中级强化石
+      advanced_stone: 0.17 # 高级强化石
+    required-stone: 'advanced_stone' # 高级强化石
   12:
     chance: 0.395
     money: 1200.0
@@ -96,7 +167,14 @@ levels:
     amount: 4
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.35
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.20
+    stone-chances:
+      stone: 0.02 # 初级强化石
+      intermediate_stone: 0.08 # 中级强化石
+      advanced_stone: 0.17 # 高级强化石
+    required-stone: 'advanced_stone' # 高级强化石
   13:
     chance: 0.340
     money: 1300.0
@@ -104,7 +182,14 @@ levels:
     amount: 5
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.35
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.30
+    stone-chances:
+      stone: 0.01 # 初级强化石
+      intermediate_stone: 0.04 # 中级强化石
+      advanced_stone: 0.12 # 高级强化石
+    required-stone: 'advanced_stone' # 高级强化石
   14:
     chance: 0.285
     money: 1400.0
@@ -112,7 +197,14 @@ levels:
     amount: 5
     attack-flat: 0.20
     attack-percent: 0.05
-    downgrade-chance: 0.35
+    defense-flat: 0.20
+    defense-percent: 0.05
+    downgrade-chance: 0.30
+    stone-chances:
+      stone: 0.01 # 初级强化石
+      intermediate_stone: 0.04 # 中级强化石
+      advanced_stone: 0.12 # 高级强化石
+    required-stone: 'advanced_stone' # 高级强化石
   15:
     chance: 0.230
     money: 1500.0
@@ -120,4 +212,12 @@ levels:
     amount: 5
     attack-flat: 0.20
     attack-percent: 0.05
+    defense-flat: 0.20
+    defense-percent: 0.05
     downgrade-chance: 0.35
+    stone-chances:
+      stone: 0.01 # 初级强化石
+      intermediate_stone: 0.04 # 中级强化石
+      advanced_stone: 0.12 # 高级强化石
+    required-stone: 'advanced_stone' # 高级强化石
+    crack-chance: 0.05

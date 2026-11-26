@@ -19,105 +19,70 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public final class ForgeMenus implements Listener,AutoCloseable {
+    private final ym.starforge.workstation.StationOrigins stationOrigins;
+    private final ym.starforge.workstation.StationAnimations stationAnimations;
     private final Plugin plugin;private final Supplier<ForgeSettings> settings;private final WeaponService weapons;private final ForgeTransaction transaction;private final Texts texts;
     private final Map<UUID,Player> viewers=new ConcurrentHashMap<>();
-    public ForgeMenus(Plugin p,Supplier<ForgeSettings> s,WeaponService w,ForgeTransaction t,Texts x){plugin=p;settings=s;weapons=w;transaction=t;texts=x;}
+    private final ForgeResultReopen resultReopens;
+    private final ForgeMenuRenderer renderer;
+    private final ForgePausedInputs<Holder> pausedInputs=new ForgePausedInputs<>();
+    public ForgeMenus(Plugin p,Supplier<ForgeSettings> s,WeaponService w,ForgeTransaction t,Texts x){this(p,s,w,t,x,null,null);}
+    public ForgeMenus(Plugin p,Supplier<ForgeSettings> s,WeaponService w,ForgeTransaction t,Texts x,
+                      ym.starforge.workstation.StationOrigins origins,ym.starforge.workstation.StationAnimations animations){
+        plugin=p;settings=s;weapons=w;transaction=t;texts=x;resultReopens=new ForgeResultReopen(p);
+        stationOrigins=origins;stationAnimations=animations;
+        renderer=new ForgeMenuRenderer(p,w,x,(player,holder)->{returnInputs(player,holder);viewers.remove(player.getUniqueId());});
+    }
     public static final class Holder implements InventoryHolder {
         final boolean admin; boolean lucky,protect; int weaponSlot=-1; final List<Integer> stoneSlots=new ArrayList<>(); final ForgeSettings revision; final Map<Integer,String> actions=new HashMap<>(); Inventory inventory;
+        boolean transitioning; net.kyori.adventure.text.Component title;
+        ym.starforge.workstation.StationAnchor station;
+        final LinkedHashMap<String,Integer> selected=new LinkedHashMap<>();
+        final Map<Integer,String> stoneActions=new HashMap<>();
+        io.papermc.paper.threadedregions.scheduler.ScheduledTask refresh;
+        ItemStack[] previewStorage;ItemStack previewWeapon;
         Holder(boolean a,boolean l,boolean p,ForgeSettings r){admin=a;lucky=l;protect=p;revision=r;}
         public Inventory getInventory(){return inventory;}
     }
     public void open(Player p,boolean admin,boolean lucky,boolean protect){
+        resultReopens.cancel(p.getUniqueId());
+        releasePaused(p);
         if(!p.hasPermission(admin?"starforge.admin":"starforge.use")){texts.send(p,"no-permission");return;}
         var cfg=settings.get();
+        if(!plugin.isEnabled()||!p.isOnline()||cfg==null)return;
         var holder=new Holder(admin,lucky,protect,cfg);
+        if(stationOrigins!=null)holder.station=stationOrigins.take(p,ym.starforge.workstation.StationAnchor.Kind.ENHANCEMENT);
         var y=admin?cfg.admin():cfg.gui();
         var rows=y.getStringList("shape");
-        var title=ym.starforge.integration.MenuArt.title(Texts.parse(y.getString("title"),Map.of("level","0")),y.getString("background-image"));
+        var title=ForgeMenuTitle.render(y.getString("title"),y.getString("background-image"),null);
+        holder.title=title;
         holder.inventory=Bukkit.createInventory(holder,rows.size()*9,title);
         paint(p,holder);
-        p.openInventory(holder.inventory);
-        viewers.put(p.getUniqueId(),p);
-    }
-    private void paint(Player player,Holder holder){
-        var cfg=holder.revision;
-        boolean lucky=holder.lucky,protect=holder.protect;
-        ItemStack item=holder.weaponSlot<0?null:holder.inventory.getItem(holder.weaponSlot);
-        if(item==null)item=new ItemStack(Material.AIR);
-        var rule=weapons.match(item);
-        boolean hasWeapon=rule!=null;
-        if(!hasWeapon)rule=ForgeSettings.defaults();
-        var stones=ForgeTransaction.snapshotStones(holder.inventory,holder.stoneSlots);
-        int stoneCount=stones.values().stream().mapToInt(ItemStack::getAmount).sum();
-        var materials=new MaterialItems(()->cfg);
-        var storage=player.getInventory().getStorageContents();
-        boolean useLucky=lucky&&Arrays.stream(storage).anyMatch(stack->materials.matches(stack,"lucky"));
-        boolean useProtect=protect&&Arrays.stream(storage).anyMatch(stack->materials.matches(stack,"protect"));
-        int current=weapons.level(item),target=Math.max(1,Math.min(rule.max(cfg.max()),current+1));
-        var plan=ForgePlan.prepare(cfg,rule,current,weapons.failures(item),useLucky);
-        var mixedPlan=hasWeapon&&plan!=null?plan.withStones(cfg,rule,current,weapons.failures(item),useLucky,
-                materials.describeStoneStacks(stones.values(),plan.material())):null;
-        boolean validStones=mixedPlan!=null;
-        if(validStones)plan=mixedPlan;
-        var level=rule.level(target,cfg.levels());double base=weapons.base(item);
-        if(plan!=null)target=plan.target();
-        String materialId=plan==null?level.stone():plan.material();
-        String stoneName;
-        try{stoneName=net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(new ym.starforge.integration.MaterialItems(()->cfg).displayName(materialId));}
-        catch(RuntimeException unavailable){stoneName=net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(texts.get("material-unavailable",Map.of()));}
-        Map<String,String> values=new HashMap<>();
-        values.put("level",""+current);values.put("next",""+target);
-        double chance=validStones?plan.chance():0;
-        values.put("chance",WeaponService.fmt(chance==1?100:Math.min(99.99,Math.floor(chance*10000)/100)));
-        values.put("money",WeaponService.fmt(plan==null?0:plan.money()));
-        int consumed=validStones?plan.amount():0;
-        values.put("materials",Integer.toString(consumed));
-        values.put("stones-loaded",Integer.toString(stoneCount));
-        values.put("stones-returned",Integer.toString(stoneCount-consumed));
-        values.put("current",WeaponService.fmt(base+weapons.bonus(item,base,current)));
-        values.put("next-attack",WeaponService.fmt(base+weapons.bonus(item,base,target)));
-        values.put("max-level",""+rule.max(cfg.max()));
-        values.put("lucky",net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(texts.get(lucky?"option-enabled":"option-disabled",Map.of())));
-        values.put("protect",net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(texts.get(protect?"option-enabled":"option-disabled",Map.of())));
-        values.put("stone-name",stoneName);
-        var meta=item.getItemMeta();
-        values.put("weapon",meta!=null&&meta.customName()!=null?net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer.plainText().serialize(meta.customName()):item.getType().name());
-        var y=holder.admin?cfg.admin():cfg.gui();
-        String shape=String.join("",y.getStringList("shape"));
-        for(int slot=0;slot<shape.length();slot++){
-            char c=shape.charAt(slot);if(c==' ')continue;var button=y.getConfigurationSection("elements."+c);String action=button.getString("action","none");
-            if(!holder.admin&&action.equals("weapon")){holder.weaponSlot=slot;continue;}
-            if(!holder.admin&&action.equals("stone")){if(!holder.stoneSlots.contains(slot))holder.stoneSlots.add(slot);continue;}
-            ItemStack icon;
-            {
-                icon=button.getBoolean("pixel-button",false)?ym.starforge.integration.MaterialItems.blankButton():new ItemStack(Material.valueOf(button.getString("material")));
-                boolean materialIcon=action.equals("stone")||button.contains("craft-engine");
-                if(materialIcon) {
-                    try {icon=new ym.starforge.integration.MaterialItems(()->cfg).create(action.equals("stone")?materialId:button.getString("craft-engine"));}
-                    catch(RuntimeException unavailable) {plugin.getLogger().warning("GUI material unavailable: "+button.getCurrentPath()+": "+unavailable.getMessage());}
-                }
-                if(!materialIcon)icon.editMeta(m->{m.customName(Texts.parse(button.getString("name",""),values));m.lore(button.getStringList("lore").stream().map(t->Texts.parse(t,values)).toList());});
-                if(!holder.admin&&(action.equals("lucky")||action.equals("protect"))&&!icon.getType().isAir()){
-                    boolean enabled=action.equals("lucky")?lucky:protect;
-                    icon.editMeta(scrollMeta->{
-                        var lore=new ArrayList<net.kyori.adventure.text.Component>();
-                        if(scrollMeta.lore()!=null)lore.addAll(scrollMeta.lore());
-                        lore.add(net.kyori.adventure.text.Component.empty());
-                        boolean available=action.equals("lucky")?useLucky:useProtect;
-                        String status=!enabled?"option-disabled":available?"option-enabled":"option-waiting";
-                        lore.add(texts.get(status,Map.of()));
-                        button.getStringList("toggle-lore").forEach(line->lore.add(Texts.parse(line,values)));
-                        scrollMeta.lore(lore.stream().map(Texts::plainStyle).toList());
-                        scrollMeta.setEnchantmentGlintOverride(enabled);
-                    });
-                }
-            }
-            holder.inventory.setItem(slot,icon);holder.actions.put(slot,action);
+        try{
+            p.openInventory(holder.inventory);
+            if(p.getOpenInventory().getTopInventory()==holder.inventory){viewers.put(p.getUniqueId(),p);watch(p,holder);}
+        }finally{
+            if(p.getOpenInventory().getTopInventory()!=holder.inventory)returnInputs(p,holder);
         }
     }
+    private void paint(Player player,Holder holder){renderer.paint(player,holder);}
     @EventHandler(ignoreCancelled=true) public void click(InventoryClickEvent event){
         if(!(event.getView().getTopInventory().getHolder() instanceof Holder h))return;event.setCancelled(true);
         if(!(event.getWhoClicked() instanceof Player p))return;
+        String material=h.stoneActions.get(event.getRawSlot());
+        if(material!=null&&!h.admin){
+            var click=event.getClick();
+            int delta=ForgeStoneCards.delta(click);
+            if(delta!=0){
+                p.getScheduler().execute(plugin,()->{
+                    if(!valid(p,h))return;
+                    var owned=new MaterialItems(()->h.revision).countSelected(p.getInventory().getStorageContents(),h.selected.keySet());
+                    h.selected.put(material,ym.starforge.transaction.ForgeStoneSelection.adjusted(h.selected.get(material),delta,owned.get(material)));
+                    paint(p,h);
+                },null,1);
+            }
+            return;
+        }
         if(!h.admin&&h.revision==settings.get()&&p.hasPermission("starforge.use")){
             int slot=event.getRawSlot();
             if((event.getClick()==ClickType.LEFT||event.getClick()==ClickType.RIGHT)&&slot>=h.inventory.getSize()&&slot<event.getView().countSlots()){
@@ -140,7 +105,7 @@ public final class ForgeMenus implements Listener,AutoCloseable {
         if(event.getClick()!=ClickType.LEFT)return;
         String action=h.actions.get(event.getRawSlot());if(action==null)return;
         ItemStack expectedWeapon=action.equals("forge")&&!h.admin?copy(h.inventory.getItem(h.weaponSlot)):null;
-        var expectedStones=action.equals("forge")&&!h.admin?ForgeTransaction.snapshotStones(h.inventory,h.stoneSlots):Map.<Integer,ItemStack>of();
+        var expectedSelection=new LinkedHashMap<>(h.selected);
         p.getScheduler().execute(plugin,()->{
             if(!plugin.isEnabled()||!p.isOnline()||p.getOpenInventory().getTopInventory()!=h.inventory)return;
             if(settings.get()!=h.revision){p.closeInventory();return;}
@@ -150,14 +115,16 @@ public final class ForgeMenus implements Listener,AutoCloseable {
                 case "forge" -> {
                     if(h.admin)return;
                     if(!Objects.equals(expectedWeapon,h.inventory.getItem(h.weaponSlot))
-                            ||!Objects.equals(expectedStones,ForgeTransaction.snapshotStones(h.inventory,h.stoneSlots))){
-                        texts.send(p,"changed");return;
+                            ||!Objects.equals(h.previewWeapon,expectedWeapon)||!h.selected.equals(expectedSelection)
+                            ||!Arrays.equals(h.previewStorage,p.getInventory().getStorageContents())){
+                        texts.send(p,"selection-changed");paint(p,h);return;
                     }
-                    transaction.execute(p,h.inventory,h.weaponSlot,h.stoneSlots,h.lucky,h.protect,
-                            ()->reopenAfterResult(p,h));
+                    transaction.executeSelection(p,h.inventory,h.weaponSlot,expectedSelection,h.lucky,h.protect,
+                            ()->reopenAfterResult(p,h),item->{if(stationAnimations!=null)stationAnimations.play(p,h.station,item);});
                     if(p.getOpenInventory().getTopInventory()==h.inventory)paint(p,h);
                 }
                 case "lucky", "protect" -> {
+                    if(h.weaponSlot>=0&&ym.starforge.item.ForgeData.cracked(h.inventory.getItem(h.weaponSlot)))return;
                     boolean enabled=action.equals("lucky")?h.lucky:h.protect;
                     if(action.equals("lucky"))h.lucky=!enabled;
                     else h.protect=!enabled;
@@ -176,25 +143,41 @@ public final class ForgeMenus implements Listener,AutoCloseable {
     }
     private void reopenAfterResult(Player player,Holder holder){
         if(player.getOpenInventory().getTopInventory()!=holder.inventory)return;
+        pausedInputs.pause(player.getUniqueId(),holder);
         player.closeInventory();
         var closedView=player.getOpenInventory().getTopInventory();
-        if(closedView.getType()!=InventoryType.CRAFTING)return;
-        player.getScheduler().execute(plugin,()->{
+        if(closedView.getType()!=InventoryType.CRAFTING){releasePaused(player);return;}
+        try{if(!resultReopens.schedule(player,()->{
+            resumePaused(player,holder,closedView);
+        }))releasePaused(player);}catch(RuntimeException ex){releasePaused(player);throw ex;}
+    }
+    /** Player ownership. Take once before open events; failure must never strand the weapon. */
+    private void resumePaused(Player player,Holder holder,Inventory closedView){
+        if(!pausedInputs.take(player.getUniqueId(),holder))return;
+        boolean restored=false;
+        try{
             if(plugin.isEnabled()&&player.isOnline()&&settings.get()==holder.revision
-                    &&player.hasPermission("starforge.use")
-                    &&player.getOpenInventory().getTopInventory()==closedView){
-                open(player,false,holder.lucky,holder.protect);
+                    &&player.hasPermission("starforge.use")&&player.getOpenInventory().getTopInventory()==closedView){
+                player.openInventory(holder.inventory);
+                if(player.getOpenInventory().getTopInventory()==holder.inventory){paint(player,holder);watch(player,holder);restored=true;}
             }
-        },null,30);
+        }finally{
+            if(!restored){
+                if(holder.refresh!=null){holder.refresh.cancel();holder.refresh=null;}
+                try{if(player.getOpenInventory().getTopInventory()==holder.inventory)player.closeInventory();}
+                finally{returnInputs(player,holder);viewers.remove(player.getUniqueId());}
+            }
+        }
+    }
+    private void releasePaused(Player player){
+        var holder=pausedInputs.take(player.getUniqueId());
+        if(holder!=null){returnInputs(player,holder);viewers.remove(player.getUniqueId());}
     }
     private static ItemStack copy(ItemStack item){return item==null?null:item.clone();}
-    private boolean isInput(Holder h,int slot){return slot>=0&&(slot==h.weaponSlot||h.stoneSlots.contains(slot));}
+    private boolean isInput(Holder h,int slot){return slot>=0&&slot==h.weaponSlot;}
     private boolean accepts(Holder h,int slot,ItemStack item){
         if(slot==h.weaponSlot)return item.getAmount()==1&&weapons.canEnhance(item);
-        var materials=new MaterialItems(()->h.revision);
-        return h.revision.materials().keySet().stream()
-                .filter(id->!id.equals("lucky")&&!id.equals("protect"))
-                .anyMatch(id->materials.matches(item,id));
+        return false;
     }
     private void repaint(Player player,Holder h){
         player.getScheduler().execute(plugin,()->{
@@ -215,17 +198,27 @@ public final class ForgeMenus implements Listener,AutoCloseable {
     }
     @EventHandler public void quit(PlayerQuitEvent e){
         var p=e.getPlayer();
+        resultReopens.cancel(p.getUniqueId());
+        releasePaused(p);
         if(p.getOpenInventory().getTopInventory().getHolder() instanceof Holder h)returnInputs(p,h);
         viewers.remove(p.getUniqueId());transaction.quit(p.getUniqueId());
     }
     @EventHandler public void closed(InventoryCloseEvent e){
         if(e.getInventory().getHolder() instanceof Holder h&&e.getPlayer() instanceof Player p){
+            if(!h.transitioning&&h.refresh!=null){h.refresh.cancel();h.refresh=null;}
+            if(h.transitioning||pausedInputs.contains(p.getUniqueId(),h))return;
             returnInputs(p,h);
             viewers.remove(p.getUniqueId());
+        }else if(e.getPlayer() instanceof Player p){
+            resultReopens.cancel(p.getUniqueId());releasePaused(p);
         }
     }
+    @EventHandler public void opened(InventoryOpenEvent e){
+        resultReopens.cancel(e.getPlayer().getUniqueId());
+        if(e.getPlayer() instanceof Player player)releasePaused(player);
+    }
     private void returnInputs(Player player,Holder h){
-        var inputs=new ArrayList<>(h.stoneSlots);
+        var inputs=new ArrayList<Integer>();
         inputs.add(h.weaponSlot);
         for(int slot:inputs){
             if(slot<0)continue;
@@ -236,8 +229,10 @@ public final class ForgeMenus implements Listener,AutoCloseable {
         }
     }
     public void close(){
+        resultReopens.close();
         for(Player p:viewers.values()){
             Runnable close=()->{
+                releasePaused(p);
                 if(p.getOpenInventory().getTopInventory().getHolder() instanceof Holder h){
                     returnInputs(p,h);
                     p.closeInventory();
@@ -251,7 +246,7 @@ public final class ForgeMenus implements Listener,AutoCloseable {
     public static void validate(YamlConfiguration y){
         var rows=y.getStringList("shape");
         if(rows.isEmpty()||rows.size()>6||rows.stream().anyMatch(s->s.length()!=9))throw new IllegalArgumentException("gui: shape requires 1..6 rows of 9 characters");
-        var valid=Set.of("none","weapon","stone","close","forge","lucky","protect","player-menu","reload","give-stone","give-intermediate","give-advanced","give-lucky","give-protect","bind");
+        var valid=Set.of("none","weapon","stone","chance","close","forge","lucky","protect","player-menu","reload","give-stone","give-intermediate","give-advanced","give-lucky","give-protect","bind");
         for(char c:String.join("",rows).toCharArray())if(c!=' '){
             var element=y.getConfigurationSection("elements."+c);if(element==null)throw new IllegalArgumentException("gui: unmapped symbol "+c);
             try{Material.valueOf(element.getString("material"));}catch(Exception e){throw new IllegalArgumentException("gui: elements."+c+".material invalid '"+element.get("material")+"'",e);}
@@ -264,5 +259,18 @@ public final class ForgeMenus implements Listener,AutoCloseable {
                     .filter(symbol->action.equals(y.getString("elements."+(char)symbol+".action"))).count();
             if(action.equals("weapon")?count!=1:count<1)throw new IllegalArgumentException("gui/main.yml: shape requires one weapon slot and at least one stone slot");
         }
+        var ids=y.getStringList("virtual-materials.materials");
+        long slots=String.join("",y.getStringList("shape")).chars().filter(c->"stone".equals(y.getString("elements."+(char)c+".action"))).count();
+        if(ids.isEmpty()||ids.size()!=new HashSet<>(ids).size()||ids.size()>slots)
+            throw new IllegalArgumentException("gui/main.yml:virtual-materials.materials requires distinct materials fitting the stone slots");
+    }
+    private boolean valid(Player p,Holder h){return plugin.isEnabled()&&p.isOnline()&&p.hasPermission("starforge.use")&&h.revision==settings.get()&&p.getOpenInventory().getTopInventory()==h.inventory;}
+    private void watch(Player p,Holder h){
+        if(h.refresh!=null)h.refresh.cancel();
+        if(h.admin)return;
+        h.refresh=p.getScheduler().runAtFixedRate(plugin,t->{
+            if(!valid(p,h)){t.cancel();return;}
+            try{paint(p,h);}catch(RuntimeException ex){t.cancel();p.closeInventory();plugin.getLogger().log(java.util.logging.Level.SEVERE,"Forge refresh failed player="+p.getUniqueId(),ex);}
+        },null,20,20);
     }
 }

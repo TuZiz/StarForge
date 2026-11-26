@@ -65,9 +65,12 @@ class StoneTierTest {
         var y=new YamlConfiguration();try(var r=new InputStreamReader(getClass().getResourceAsStream("/gui/main.yml"),java.nio.charset.StandardCharsets.UTF_8)){y.load(r);}
         var shape=String.join("",y.getStringList("shape"));
         assertEquals(19,shape.indexOf('W'));
-        assertEquals(38,shape.indexOf('L'));
-        assertEquals(42,shape.indexOf('P'));
-        assertEquals(25,shape.indexOf('C'));
+        assertEquals(6,shape.indexOf('L'));
+        assertEquals(8,shape.indexOf('P'));
+        assertEquals(40,shape.indexOf('X'));
+        assertEquals(10,shape.indexOf('Q'));assertEquals("chance",y.getString("elements.Q.action"));
+        assertEquals(List.of(25,34),java.util.stream.IntStream.range(0,shape.length())
+                .filter(i->shape.charAt(i)=='C').boxed().toList());
         assertEquals(List.of(12,13,14,21,22,23,30,31,32),java.util.stream.IntStream.range(0,shape.length())
                 .filter(i->shape.charAt(i)=='S').boxed().toList());
         assertEquals("weapon",y.getString("elements.W.action"));

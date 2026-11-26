@@ -4,3 +4,5 @@ target/
 *.iml
 artifacts/
 dist/
+
+__pycache__/

@@ -1,0 +1,1 @@
+{"gui_light":"front","textures":{"art":"starforge:item/crafting/count_digits","particle":"starforge:item/crafting/count_digits"},"elements":[{"from":[-1.5,5.5,8],"to":[1.5,10.5,8.01],"shade":false,"faces":{"south":{"uv":[3,0,3.75,2.5],"texture":"#art"},"north":{"uv":[3.75,0,3,2.5],"texture":"#art"}}}],"display":{"gui":{"rotation":[0,0,0],"translation":[0,0,0],"scale":[1,1,1]}}}

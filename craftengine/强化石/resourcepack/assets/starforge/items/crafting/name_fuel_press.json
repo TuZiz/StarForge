@@ -1,0 +1,1 @@
+{"oversized_in_gui":true,"model":{"type":"minecraft:condition","property":"minecraft:custom_model_data","index":0,"on_true":{"type":"minecraft:model","model":"starforge:item/crafting/name_fuel_press_locked"},"on_false":{"type":"minecraft:model","model":"starforge:item/crafting/name_fuel_press"}}}

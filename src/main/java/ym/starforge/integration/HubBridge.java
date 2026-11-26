@@ -13,7 +13,7 @@ public final class HubBridge {
         var lore=Bukkit.getServicesManager().load(ItemHubLoreDecoratorApi.class);
         if(lore==null)throw new IllegalStateException("Update ItemHub: ItemHubLoreDecoratorApi required for inline enhancement Lore");
         AutoCloseable lines=lore.register(plugin,"enhancement",(id,item,base)->weapons.decorateLore(item,java.util.List.copyOf(base)));
-        AutoCloseable modifier=api.register(plugin,"enhancement",(id,item)->weapons.render(item,true));
+        AutoCloseable modifier=api.register(plugin,"enhancement",(id,item)->weapons.refresh(item));
         return ()->{modifier.close();lines.close();};
     }
 }

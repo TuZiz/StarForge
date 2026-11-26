@@ -11,9 +11,10 @@ softdepend:
   - 'CraftEngine'
   - 'ItemHub'
   - 'AsterStats'
+  - 'NextDoorFarm'
 commands:
   starforge:
-    description: '武器强化、耗时锻造与管理'
+    description: '物品制作、兑换、耗时锻造与武器强化管理'
     aliases:
       - 'sf'
 permissions:
@@ -21,5 +22,5 @@ permissions:
     description: '使用强化、耗时锻造、幸运符与保护符'
     default: true
   starforge.admin:
-    description: '管理菜单、发放材料、绑定、武器标记、设置等级和重载'
+    description: '管理配方解锁、菜单、材料、标记、等级和重载'
     default: op

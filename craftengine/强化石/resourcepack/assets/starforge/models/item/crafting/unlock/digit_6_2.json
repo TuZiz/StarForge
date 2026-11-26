@@ -1,0 +1,1 @@
+{"gui_light":"front","textures":{"art":"starforge:item/crafting/unlock/digits","particle":"starforge:item/crafting/unlock/digits"},"elements":[{"from":[9,7,8],"to":[12,12,8.01],"shade":false,"faces":{"south":{"uv":[2,0,2.75,10],"texture":"#art"},"north":{"uv":[2.75,0,2,10],"texture":"#art"}}}],"display":{"gui":{"rotation":[0,0,0],"translation":[0,0,0],"scale":[1,1,1]}}}

@@ -20,7 +20,9 @@ public final class WeaponService implements StarForgeApi {
     public boolean canEnhance(ItemStack item){return match(item)!=null;}
     public int maxLevel(ItemStack item){var w=match(item);return w==null?0:w.max(settings.get().max());}
     public double base(ItemStack item){var result=resolve(item);return result==null?0:result.base();}
-    public double bonus(ItemStack item,double base,int level){var w=match(item);return w==null?0:settings.get().bonus(base,level,w);}
+    public EnhancementStat stat(ItemStack item){var result=resolve(item);return result==null?EnhancementStat.ATTACK:result.stat();}
+    public double bonus(ItemStack item,double base,int level){var result=resolve(item);return result==null?0:bonus(result,base,level);}
+    private double bonus(WeaponResolver.Result result,double base,int level){return settings.get().bonus(base,level,result.rule(),result.stat()==EnhancementStat.DEFENSE);}
     public int level(ItemStack item){return ForgeData.level(item);}
     public int failures(ItemStack item){return ForgeData.failures(item);}
     public ItemStack markWeapon(ItemStack item,boolean enabled){
@@ -30,26 +32,35 @@ public final class WeaponService implements StarForgeApi {
     public ItemStack baseItem(ItemStack item){return presentation.strip(item);}
     public Map<String,Double> contribution(ItemStack item,Map<String,Double> latestBase){
         var result=resolve(item);if(result==null||settings.get().backend().equals("vanilla"))return Map.of();
-        double base=latestBase.getOrDefault("attack",result.base());
-        return Map.of("attack",settings.get().bonus(base,level(item),result.rule()));
+        double base=latestBase.getOrDefault(result.stat().key(),result.base());
+        return Map.of(result.stat().key(),bonus(result,base,level(item)));
     }
-    public ItemStack refresh(ItemStack input){return render(input,false);}
+    @Override public Map<String,Double> contribution(ItemStack item,String slot,Map<String,Double> latestBase){
+        var result=resolve(item);if(result==null||!result.slot().equals(slot))return Map.of();
+        return contribution(item,latestBase);
+    }
     public List<Component> decorateLore(ItemStack item,List<Component> lore){
-        var result=resolve(item);if(result==null)return ForgeLorePresentation.strip(lore);
-        return ForgeLorePresentation.decorate(lore,level(item),settings.get().bonus(result.base(),level(item),result.rule()),settings.get());
+        var result=resolve(item);
+        var cfg=settings.get();
+        var clean=result==null?ForgeLorePresentation.strip(lore)
+            :ForgeLorePresentation.decorate(lore,level(item),bonus(result,result.base(),level(item)),cfg,result.stat());
+        return ForgeLorePresentation.withCrack(clean,ForgeData.cracked(item),cfg);
     }
     public Component loreLine(ItemStack item){
         double base=base(item),bonus=bonus(item,base,level(item));
-        return Texts.parse(settings.get().messages().get("weapon-line"),Map.of("level",""+level(item),"base",fmt(base),"bonus",fmt(bonus),"total",fmt(base+bonus)));
+        return Texts.parse(settings.get().messages().get(stat(item).messagePrefix()+"-line"),Map.of("level",""+level(item),"base",fmt(base),"bonus",fmt(bonus),"total",fmt(base+bonus)));
     }
-    /** freshBase means ItemHub just supplied new configuration-managed metadata. */
-    public ItemStack render(ItemStack input,boolean freshBase){
+    /** ItemHub may supply either a new base name or a preserved decorated name. */
+    public ItemStack refresh(ItemStack input){
         var result=resolve(input);if(result==null)return input.getPersistentDataContainer().has(ForgeData.LEVEL)?baseItem(input):input.clone();
         if(!input.getPersistentDataContainer().has(ForgeData.LEVEL))return input.clone();
         Component suffix=level(input)>0?Texts.parse(settings.get().messages().get("level-suffix"),Map.of("level",""+level(input))):null;
         var base=baseItem(input);var lore=base.getItemMeta().lore();
-        var decorated=ForgeLorePresentation.decorate(lore==null?List.of():lore,level(input),settings.get().bonus(result.base(),level(input),result.rule()),settings.get());
-        return presentation.apply(input,suffix,decorated,settings.get().bonus(result.base(),level(input),result.rule()),settings.get().backend().equals("vanilla"),freshBase);
+        double bonus=bonus(result,result.base(),level(input));
+        var cfg=settings.get();
+        var decorated=ForgeLorePresentation.withCrack(
+            ForgeLorePresentation.decorate(lore==null?List.of():lore,level(input),bonus,cfg,result.stat()),ForgeData.cracked(input),cfg);
+        return presentation.apply(input,suffix,decorated,bonus,settings.get().backend().equals("vanilla"),result.stat());
     }
     public static String fmt(double n){return String.format(Locale.ROOT,"%.2f",n);}
 }

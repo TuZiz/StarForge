@@ -1,50 +1,82 @@
 schema-version: 1
-title: '<font:starforge:ui><#F1E9FF>星锻工坊</font>'
-background-image: 'starforge:crafting_menu'
-ingredient-line: '<#CBD5E1>{material} <#FBBF24>{owned}/{required}'
-# 框中心按真实箱子槽位对齐：x=16+18×列，y=26+18×行。
-# 配方位于行1～3、列1～3，成品位于行2、列7。
-# 底部操作列为0/2/4/6/8，中心y=98。
+background-image: 'starforge:craft_gallery_six'
+title: '<font:starforge:ui><#EAD6AF>    装备配方</font>'
+# 可为任意品类设置配方页标题。未配置时显示上方的 title。
+category-titles:
+  machines: '<font:starforge:ui><#EAD6AF>    机器配方</font>' # 机器
+
+# 每页六张配方卡。收获解锁的配方可提前查看。
 shape:
-  - 'FFFFFFFFF'
-  - 'FRRRFFFFF'
-  - 'FRRRFFFOF'
-  - 'FRRRFFFFF'
-  - 'BFTFCFNFX'
+  - 'FRFFRFFRF'
+  - 'FSFFSFFSF'
+  - 'FRFFRFFRF'
+  - 'FSFFSFFSF'
+  - 'PNFBBBTTT'
+
 elements:
   F:
-    material: 'AIR'
-    name: ''
     action: 'none'
+    material: 'BLACK_STAINED_GLASS_PANE'
+    name: ''
+
   R:
     action: 'recipe'
+    # 可用客户端 ItemModel 为指定配方覆盖未解锁卡片。省略时使用共用卡片。
+    locked-models:
+      fuel_press: 'starforge:crafting/unlock/recipe_fuel_press' # 燃料压制机
+    # 材料名称来自真实 CE / ItemHub 物品；数量每秒随背包更新。
+    material-enough: '<#4ADE80>  ✔ <#CBD5E1>{material} <#86EFAC>×{required} <#64748B>(拥有 {owned} · 充足)'
+    material-missing: '<#F87171>  ✕ <#CBD5E1>{material} <#F87171>×{required} <#64748B>(拥有 {owned} · <#FCA5A5>缺 {missing}<#64748B>)'
     lore:
-      - '<#FBBF24>金币 {money}'
-      - '<#CBD5E1>状态 {state}'
-      - '<#67E8F9>制作进度 {progress}% · 剩余 {seconds} 秒'
-      - '<#94A3B8>点击选择，制作记录中点击领取成品'
-  O:
-    action: 'result'
-    lore:
-      - '<#FBBF24>金币 {money}'
-      - '<#67E8F9>进度 {progress}% · 剩余 {seconds} 秒'
-  B:
+      - ''
+      - '<#C084FC>❖ 材料需求:'
+      - '{materials}'
+      - ''
+      - '<#94A3B8>▸ 预计产出: <#E2E8F0>{amount} 件'
+      - '<#94A3B8>▸ 锻造费用: <#FBBF24>{money} 金币'
+      - '<#94A3B8>▸ 预计耗时: <#67E8F9>{duration} 秒'
+      - ''
+      - '<#86EFAC>► 点击进入锻造台查看详情'
+
+  P:
     action: 'previous'
-    name: '<#FBBF24>上一页'
+    craft-engine: 'starforge:craft_nav_previous'
+    name: '<#FBBF24>« 上一页'
+    lore:
+      - '<#94A3B8>点击切换至上一页配方'
+
+  T:
+    action: 'orders'
+    craft-engine: 'starforge:gui_blank'
+    name: '<#67E8F9>⏳ 我的锻造队列'
+    lore:
+      - ''
+      - '<#94A3B8>▸ 查看正在进行的锻造进度与剩余时间'
+      - '<#94A3B8>▸ 离线期间锻造计时将正常进行'
+      - ''
+      - '<#86EFAC>► 点击查看队列 / 领取成品'
+
   N:
     action: 'next'
-    name: '<#FBBF24>下一页'
-  T:
-    action: 'progress'
-    name: '<#67E8F9>配方 / 我的锻造'
+    craft-engine: 'starforge:craft_nav_next'
+    name: '<#FBBF24>下一页 »'
     lore:
-      - '<#CBD5E1>切换查看全部制作记录'
-  C:
-    action: 'confirm'
-    name: '<#86EFAC>开始锻造 / 领取成品'
-    lore:
-      - '<#CBD5E1>{state} · {progress}%'
-      - '<#FBBF24>剩余 {seconds} 秒'
-  X:
-    action: 'close'
-    name: '<#F87171>关闭'
+      - '<#94A3B8>点击切换至下一页配方'
+
+
+  B:
+    action: 'back'
+    craft-engine: 'starforge:gui_blank'
+    name: '<#EAD6AF>返回类型'
+  S:
+    action: 'recipe-caption'
+    craft-engine: 'starforge:gui_blank'
+    # 卡片文字由独立CE物品显示；新增配方可在此指定对应名称贴图。
+    captions:
+      iron_sword: 'starforge:craft_name_iron_sword'
+      star_sword: 'starforge:craft_name_star_sword'
+      aster_head: 'starforge:craft_name_aster_head'
+      aster_chest: 'starforge:craft_name_aster_chest'
+      aster_legs: 'starforge:craft_name_aster_legs'
+      aster_feet: 'starforge:craft_name_aster_feet'
+      fuel_press: 'starforge:craft_name_fuel_press' # 燃料压制机

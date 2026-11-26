@@ -14,6 +14,9 @@ public final class MenuArt {
         return CraftEngineMenuArt.title(text,imageId);
     }
     static Component compose(Component image,Component title) {
+        // Offset glyphs belong only to the background. Unstyled dynamic names must not
+        // inherit that private-use font; preserve any explicitly configured title font.
+        if(title.font()==null)title=title.font(Key.key("minecraft:default"));
         return Texts.plainStyle(Component.text("\uE100").font(Key.key("starforge:offsets"))
             .append(image).append(Component.text("\uE101").font(Key.key("starforge:offsets"))).append(title));
     }

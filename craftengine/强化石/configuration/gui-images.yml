@@ -5,8 +5,23 @@ images:
     ascent: 13
     font: minecraft:default
     file: starforge:font/gui/forge_menu.png
-  starforge:crafting_menu:
+  starforge:craft_orders_six:
     height: 110
     ascent: 13
     font: minecraft:default
-    file: starforge:font/gui/crafting_menu.png
+    file: starforge:font/gui/craft_orders_six.png
+  starforge:craft_types_six:
+    height: 110
+    ascent: 13
+    font: minecraft:default
+    file: starforge:font/gui/craft_types_six.png
+  starforge:craft_gallery_six:
+    height: 110
+    ascent: 13
+    font: minecraft:default
+    file: starforge:font/gui/craft_gallery_six.png
+  starforge:craft_detail_six:
+    height: 128
+    ascent: 13
+    font: minecraft:default
+    file: starforge:font/gui/craft_detail_six.png

@@ -1,14 +1,39 @@
 schema-version: 1
-# S 放强化石，W 放单件武器。L/P 切换背包中的符文。
+# W 托管单件武器或防具；S 为背包材料的虚拟数量卡，L/P 为卷轴开关。
 background-image: 'starforge:forge_menu'
-title: '<font:starforge:ui><#F1E9FF>星锻强化</font>'
+title: '<font:starforge:ui><#EAD6AF>    星锻强化</font> <#EAD6AF>{weapon}'
 
 shape:
-  - 'FFFFFFFFF'
-  - 'FFFSSSFFF'
+  - 'FFFFFFLFP'
+  - 'FQFSSSFFF'
   - 'FWFSSSFCF'
-  - 'FFFSSSFFF'
-  - 'FFLFFFPXF'
+  - 'FFFSSSFCF'
+  - 'FFFFXFFFF'
+
+# 按此顺序配料；达到 100% 且满足最低数量即停止，多选部分不消耗。
+virtual-materials:
+  target-chance: '<#94A3B8>目标 <#EAD6AF>+{target} <#64748B>· <#94A3B8>每颗贡献 <#67E8F9>{per-stone}%'
+  materials:
+    - 'stone'
+    - 'intermediate_stone'
+    - 'advanced_stone'
+  selection-lore:
+    - ''
+    - '<#94A3B8>背包 <#E2E8F0>{owned} 颗 <#64748B>· <#94A3B8>选择 <#FDE68A>{selected} 颗'
+    - '<#94A3B8>所选概率贡献 <#67E8F9>{contribution}%'
+    - '<#94A3B8>本次实扣 <#FDE68A>{consumed} 颗 <#64748B>· <#94A3B8>不消耗 <#86EFAC>{untouched} 颗'
+    - ''
+    - '<#EAD6AF>左键 +1 <#64748B>│ <#EAD6AF>右键 −1'
+    - '<#EAD6AF>Shift 左键 +5 <#64748B>│ <#EAD6AF>Shift 右键 −5'
+    - '<#94A3B8>图标与下方数字均可加减数量。'
+  shortage-lore:
+    - ''
+    - '<#F87171>背包不足：拥有 {owned} 颗，选择 {selected} 颗'
+    - '<#CBD5E1>搭配已保留，请补充材料或减少数量。'
+    - ''
+    - '<#EAD6AF>右键 −1 <#64748B>│ <#EAD6AF>Shift 右键 −5'
+    - '<#94A3B8>图标与下方数字均可减少数量。'
+  material-line: '<#CBD5E1>{material} <#64748B>· <#94A3B8>选择 {selected} <#64748B>→ <#FDE68A>实扣 {consumed}'
 
 elements:
   F:
@@ -20,6 +45,15 @@ elements:
     material: 'AIR'
     action: 'stone'
 
+  Q:
+    material: 'AIR'
+    pixel-button: true
+    name: '<#EAD6AF>强化成功率 <#86EFAC>{chance}%'
+    lore:
+      - '{selection-status}'
+      - '<#94A3B8>随强化石搭配、保底和实际使用的幸运符更新。'
+    action: 'chance'
+
   W:
     material: 'AIR'
     action: 'weapon'
@@ -28,6 +62,9 @@ elements:
     material: 'AIR'
     craft-engine: 'lucky'
     action: 'lucky'
+    availability-lore:
+      - '<#94A3B8>可用数量 <#FDE68A>{scroll-owned} 张 <#64748B>· <#94A3B8>本次使用 <#FDE68A>{scroll-used} 张'
+      - '{scroll-status}'
     toggle-lore:
       - '<#FDE68A>左键切换本次是否使用幸运符。'
 
@@ -35,6 +72,9 @@ elements:
     material: 'AIR'
     craft-engine: 'protect'
     action: 'protect'
+    availability-lore:
+      - '<#94A3B8>可用数量 <#67E8F9>{scroll-owned} 张 <#64748B>· <#94A3B8>本次使用 <#67E8F9>{scroll-used} 张'
+      - '{scroll-status}'
     toggle-lore:
       - '<#67E8F9>左键切换本次是否使用保护符。'
 
@@ -42,14 +82,24 @@ elements:
     material: 'AIR'
     pixel-button: true
     name: '<#4ADE80>✦ <bold>确认强化</bold>'
-    lore:
+    repair-name: '<#FDE68A><bold>修复裂纹</bold>'
+    repair-lore:
+      - '<#CBD5E1>修复后可继续强化，保留等级与保底。'
       - ''
-      - '<#94A3B8>左侧放单件武器，中间九格可混放强化石。'
-      - '<#94A3B8>按槽位顺序扣石，达到 100% 后返还多余的石头。'
-      - '<#CBD5E1>攻击力 <#F8FAFC>{current} <#64748B>→ <#4ADE80>{next-attack}'
+      - '<#94A3B8>中级强化石 <#FDE68A>{repair-owned} <#64748B>/ <#F8FAFC>{repair-count} 颗'
+    risk-lore:
+      - '<#94A3B8>结果概率 <#CBD5E1>保持 {keep-chance}% <#64748B>· <#FB923C>降级 {drop-chance}% <#64748B>· <#FDE68A>裂纹 {crack-chance}%'
+    selection-lore:
+      - ''
+      - '<#94A3B8>强化石与卷轴留在背包，确认后按本次预览扣除。'
+      - '{selection-status}'
+      - '{materials-breakdown}'
+      - '<#CBD5E1>{stat-name} <#F8FAFC>{current} <#64748B>→ <#4ADE80>{next-value}'
       - '<#64748B> ├ <#CBD5E1>当前成功率: <#FDE047><bold>{chance}%</bold>'
       - '<#64748B> ├ <#CBD5E1>消耗金币: <#FBBF24>{money}'
-      - '<#64748B> ╰ <#CBD5E1>放入 <#F8FAFC>{stones-loaded} <#CBD5E1>· 实扣 <#FDE047>{materials} <#CBD5E1>· 返还 <#86EFAC>{stones-returned}'
+      - '<#64748B> ╰ <#CBD5E1>选择 <#F8FAFC>{stones-loaded} <#CBD5E1>· 实扣 <#FDE047>{materials} <#CBD5E1>· 不消耗 <#86EFAC>{stones-returned}'
+      - '<#94A3B8>幸运符 <#FDE68A>{lucky-owned} 张 <#64748B>· <#CBD5E1>{lucky} <#64748B>· <#94A3B8>本次 {lucky-used} 张'
+      - '<#94A3B8>保护符 <#67E8F9>{protect-owned} 张 <#64748B>· <#CBD5E1>{protect} <#64748B>· <#94A3B8>本次 {protect-used} 张'
       - ''
       - '<#86EFAC>▶ 点击立即开始星锻强化'
     action: 'forge'

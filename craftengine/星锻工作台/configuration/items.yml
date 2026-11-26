@@ -1,0 +1,46 @@
+schema-version: 1
+# 可拿取和放置的工作台物品；外观只引用本包模型。
+items:
+  starforge:enhancement_station:
+    material: 'paper'
+    model: 'starforge:block/workstations/enhancement_station'
+    data:
+      item_name: '<#83D9EC>强化台'
+      lore:
+        - '<#C2C9D0>放入装备与强化石，提升装备强化等级。'
+        - ''
+        - '<#8EA0AE>放置后 <#83D9EC>右键<#C2C9D0> 打开强化台菜单'
+    behavior:
+      type: 'furniture_item'
+      furniture: 'starforge:enhancement_station'
+      rules:
+        ground:
+          alignment: 'center'
+          rotation: 'four'
+  # 内部称号框，仅供家具显示，不加入分类。
+  starforge:enhancement_nameplate:
+    material: 'paper'
+    model: 'starforge:block/workstations/enhancement_nameplate'
+    data:
+      item_name: ''
+  starforge:crafting_nameplate:
+    material: 'paper'
+    model: 'starforge:block/workstations/crafting_nameplate'
+    data:
+      item_name: ''
+  starforge:crafting_station:
+    material: 'paper'
+    model: 'starforge:block/workstations/crafting_station'
+    data:
+      item_name: '<#E4B47C>锻造台'
+      lore:
+        - '<#C2C9D0>查看配方、制作装备与领取锻造成品。'
+        - ''
+        - '<#8EA0AE>放置后 <#E4B47C>右键<#C2C9D0> 打开锻造台菜单'
+    behavior:
+      type: 'furniture_item'
+      furniture: 'starforge:crafting_station'
+      rules:
+        ground:
+          alignment: 'center'
+          rotation: 'four'

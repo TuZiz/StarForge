@@ -29,11 +29,14 @@ public final class WeaponRulesLoader {
                     require(target>=1&&target<=max,path+".levels."+level,target);
                     var o=overrides.getConfigurationSection(level);require(o!=null,path+".levels."+level,overrides.get(level));
                     var d=defaults.get(target);String p=path+".levels."+level;
-                    for(String field:o.getKeys(false))require(Set.of("chance","money","material","amount","attack-flat","attack-percent","downgrade-chance").contains(field),p+"."+field,o.get(field));
+                    for(String field:o.getKeys(false))require(Set.of("chance","money","material","amount","attack-flat","attack-percent","defense-flat","defense-percent","downgrade-chance").contains(field),p+"."+field,o.get(field));
                     String stone=o.contains("material")?text(o,"material",p):d.stone();require(materials.containsKey(stone),p+".material",stone);
                     levels.put(target,new ForgeSettings.Level(num(o,"chance",d.chance(),0,1,p),num(o,"money",d.cost(),0,1e9,p),stone,
                         o.contains("amount")?integer(o,"amount",1,2304,p):d.amount(),num(o,"attack-flat",d.flat(),0,1e6,p),
-                        num(o,"attack-percent",d.percent(),0,100,p),target<=10?0:num(o,"downgrade-chance",d.downgrade(),0,1,p)));
+                        num(o,"attack-percent",d.percent(),0,100,p),target<=10?0:num(o,"downgrade-chance",d.downgrade(),0,1,p),
+                        num(o,"defense-flat",d.defenseFlat(),0,1e6,p),num(o,"defense-percent",d.defensePercent(),0,100,p),
+                        d.stoneChances(),d.requiredStone(),d.crackChance()));
+                    require(levels.get(target).downgrade()+d.crackChance()<=1,p+".downgrade-chance",o.get("downgrade-chance"));
                 }
             }
             var weapon=new ForgeSettings.Weapon(hub,material,fallback,marker,blocked,cap,growth,levels,s.contains("base-attack"));
@@ -49,6 +52,12 @@ public final class WeaponRulesLoader {
             // A multi-step stone may simply be unavailable immediately below a custom cap.
             if(target>limit)continue;
             require(rule==null||rule.allows(target),path+".levels."+(current+1)+".material",id+" cannot enhance +"+current);
+            String required=w.level(target,defaults).requiredStone();
+            if(!required.isEmpty()){
+                var gate=materials.get(required).stone();
+                require(gate==null?required.equals(id):gate.allows(target)&&gate.steps()==target-current,
+                    path+".levels."+target+".required-stone",required+" cannot enhance +"+current);
+            }
         }
     }
     private static String text(ConfigurationSection s,String k,String p){if(!s.contains(k))return null;Object v=s.get(k);require(v instanceof String&&!((String)v).isBlank(),p+"."+k,v);return (String)v;}

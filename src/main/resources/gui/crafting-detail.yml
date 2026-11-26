@@ -1,0 +1,96 @@
+schema-version: 1
+background-image: 'starforge:craft_detail_six'
+title: '<font:starforge:ui><#EAD6AF>    制作确认</font>'
+
+# 左侧两层三列材料；数量在材料正下方。右侧成品，底栏确认与返回。
+shape:
+  - 'FFFFFFFFF'
+  - 'FIFIFIFOF'
+  - 'FDFDFDFFF'
+  - 'FIFIFIFFF'
+  - 'FDFDFDFFF'
+  - 'PFNFBFCCC'
+
+elements:
+  F:
+    action: 'none'
+    material: 'BLACK_STAINED_GLASS_PANE'
+    name: ''
+
+  I:
+    action: 'ingredient'
+    lore:
+      - ''
+      - '<#94A3B8>▸ 需求数量: <#FBBF24>{required} <#64748B>/ <#CBD5E1>拥有 {owned}'
+      - ''
+      - '<#64748B>❖ 开始锻造时将自动从背包扣除'
+    order-lore:
+      - ''
+      - '<#94A3B8>▸ 当前状态: <#CBD5E1>{state}'
+      - '<#94A3B8>▸ 锻造进度: <#67E8F9>[{bar}] <#38BDF8>{progress}%'
+      - '<#94A3B8>▸ 剩余时间: <#FBBF24>{seconds} 秒'
+      - ''
+      - '<#64748B>❖ 材料已投入，关闭菜单或离线不影响计时'
+
+  O:
+    action: 'result'
+    lore:
+      - ''
+      - '<#94A3B8>▸ 预计产出: <#E2E8F0>{amount} 件'
+      - '<#94A3B8>▸ 锻造消耗: <#FBBF24>{money} 金币'
+      - '<#94A3B8>▸ 预计耗时: <#67E8F9>{duration} 秒'
+    order-lore:
+      - ''
+      - '<#94A3B8>▸ 本单产出: <#E2E8F0>{amount} 件 <#64748B>({state})'
+      - '<#94A3B8>▸ 锻造进度: <#67E8F9>[{bar}] <#38BDF8>{progress}%'
+      - '<#94A3B8>▸ 剩余时间: <#FBBF24>{seconds} 秒'
+      - ''
+      - '<#64748B>❖ 成品将按开始制作时保存的属性发放'
+
+  B:
+    action: 'back'
+    craft-engine: 'starforge:craft_nav_previous'
+    name: '<#FBBF24>« 返回配方列表'
+    lore:
+      - '<#94A3B8>点击返回上一级菜单'
+
+  P:
+    action: 'previous'
+    craft-engine: 'starforge:craft_nav_previous'
+    name: '<#FBBF24>« 上一页材料'
+    lore:
+      - '<#94A3B8>当前页码: <#CBD5E1>{page}<#64748B>/{pages}'
+
+  C:
+    action: 'confirm'
+    craft-engine: 'starforge:gui_blank'
+    idle-name: '<#86EFAC>✦ 开始锻造 ✦'
+    running-name: '<#67E8F9>⚙ 正在锻造 · {progress}%'
+    ready-name: '<#4ADE80>✔ 点击领取成品'
+    pending-name: '<#FBBF24>⏳ 订单处理中...'
+    empty-name: '<#94A3B8>❖ 订单已领取'
+    lore:
+      - ''
+      - '<#94A3B8>▸ 锻造费用: <#FBBF24>{money} 金币'
+      - '<#94A3B8>▸ 预计耗时: <#67E8F9>{duration} 秒'
+      - ''
+      - '<#86EFAC>► 每次确认一份，单独扣费扣料'
+      - '<#94A3B8>制作成功后进入我的锻造，查看进度并领取成品'
+    order-lore:
+      - ''
+      - '<#94A3B8>▸ 订单状态: <#CBD5E1>{state}'
+      - '<#94A3B8>▸ 锻造进度: <#67E8F9>{progress}% <#64748B>(剩余 <#FBBF24>{seconds}秒<#64748B>)'
+
+  N:
+    action: 'next'
+    craft-engine: 'starforge:craft_nav_next'
+    name: '<#FBBF24>下一页材料 »'
+    lore:
+      - '<#94A3B8>当前页码: <#CBD5E1>{page}<#64748B>/{pages}'
+
+
+  D:
+    action: 'ingredient-count'
+    name: '<#EAD6AF>拥有 {owned} / 需要 {required}'
+    lore:
+      - '<#94A3B8>绿色为充足，红色为不足'

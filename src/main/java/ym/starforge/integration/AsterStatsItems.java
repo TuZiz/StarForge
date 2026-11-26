@@ -8,11 +8,14 @@ import java.lang.reflect.InvocationTargetException;
 /** Optional, noncached lookup. AsterStats' base-only service never calls enhancement contribution. */
 public final class AsterStatsItems {
     public static Map<String,Double> base(ItemStack item){
+        return base(item,"mainhand");
+    }
+    public static Map<String,Double> base(ItemStack item,String slot){
         var plugin=Bukkit.getPluginManager().getPlugin("AsterStats");if(plugin==null||!plugin.isEnabled())return Map.of();
         try{
             Class<?> api=plugin.getClass().getClassLoader().loadClass("dev.aster.asterstats.api.AsterStatsItemApi");
             Object provider=Bukkit.getServicesManager().load(api);if(provider==null)return Map.of();
-            Object result=api.getMethod("readBase",ItemStack.class,String.class).invoke(provider,item.clone(),"mainhand");
+            Object result=api.getMethod("readBase",ItemStack.class,String.class).invoke(provider,item.clone(),slot);
             var values=new java.util.HashMap<String,Double>();
             for(var e:((Map<?,?>)result).entrySet()){
                 if(!(e.getKey() instanceof String key)||!(e.getValue() instanceof Number n)||!Double.isFinite(n.doubleValue()))throw new IllegalStateException("AsterStats invalid base item attributes");

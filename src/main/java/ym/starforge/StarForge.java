@@ -14,10 +14,16 @@ import ym.starforge.command.ForgeCommand;
 import ym.starforge.integration.*;
 import ym.starforge.text.Texts;
 import ym.starforge.transaction.*;
+import ym.starforge.workstation.WorkstationHammers;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 
 public final class StarForge extends JavaPlugin {
+    private final ym.starforge.workstation.StationOrigins stationOrigins=new ym.starforge.workstation.StationOrigins();
+    private volatile ym.starforge.workstation.StationAnimationSettings stationSettings;
+    private ym.starforge.workstation.StationAnimations stationAnimations;
+    private WorkstationHammers stationHammers;
+    private ym.starforge.crafting.RecipeUnlocks recipeUnlocks;
     private volatile ym.starforge.crafting.CraftingConfig craftingConfig; private ym.starforge.crafting.CraftingOrders craftingOrders; private ym.starforge.crafting.CraftingMenu craftingMenu;
     private volatile ForgeSettings settings;private final AtomicBoolean loading=new AtomicBoolean();
     private EquipmentSync sync;private WeaponService weapons;private ForgeMenus menus;private ForgeTransaction transaction;private OperationLog log;private AutoCloseable hub;private PlaceholderCache placeholders;
@@ -27,8 +33,10 @@ public final class StarForge extends JavaPlugin {
         Bukkit.getAsyncScheduler().runNow(this,task->{
             try{var loaded=new SettingsLoader(this).load();ForgeMenus.validate(loaded.gui());ForgeMenus.validate(loaded.admin());
                 var craftingLoaded=ym.starforge.crafting.CraftingConfig.load(this);
+                var stationLoaded=ym.starforge.workstation.StationAnimationSettings.load(this);
                 if(craftingOrders==null)craftingOrders=new ym.starforge.crafting.CraftingOrders(getDataFolder().toPath().resolve("crafting-orders.yml"));
-                if(!isEnabled()){if(craftingOrders!=null)craftingOrders.close();return;}
+                if(recipeUnlocks==null)recipeUnlocks=new ym.starforge.crafting.RecipeUnlocks(getDataFolder().toPath().resolve("recipe-unlocks.yml"));
+                if(!isEnabled()){if(craftingOrders!=null)craftingOrders.close();if(recipeUnlocks!=null)recipeUnlocks.close();return;}
                 Bukkit.getGlobalRegionScheduler().execute(this,()->{try{if(!isEnabled())return;
                     if(loaded.backend().equals("asterstats")) {
                         var stats=getServer().getPluginManager().getPlugin("AsterStats");
@@ -36,22 +44,38 @@ public final class StarForge extends JavaPlugin {
                         stats.getClass().getClassLoader().loadClass("dev.aster.asterstats.equipment.StarForgeAttributes");
                         stats.getClass().getClassLoader().loadClass("dev.aster.asterstats.api.AsterStatsItemApi");
                     }
-                    if(menus!=null)menus.close();if(craftingMenu!=null)craftingMenu.close();craftingConfig=craftingLoaded;settings=loaded;if(weapons==null)start();
-                    getLogger().info("Loaded configuration schema=1 weapons-schema=2 max="+loaded.max()+" backend="+loaded.backend()+" weapon-rules="+loaded.weapons().size());
+                    if(stationHammers!=null)stationHammers.close();
+                    if(stationAnimations!=null)stationAnimations.close();
+                    if(menus!=null)menus.close();
+                    settings=loaded;stationSettings=stationLoaded;craftingConfig=craftingLoaded;
+                    if(craftingMenu!=null)craftingMenu.retire(craftingLoaded);
+                    if(weapons==null)start();
+                    if(getServer().getPluginManager().isPluginEnabled("CraftEngine")) {
+                        stationHammers=new WorkstationHammers(this,craftingOrders::activeStations,()->stationSettings);
+                        stationHammers.start();
+                    }
+                    getLogger().info("Loaded configuration schema=1 weapons-schema=2 max="+loaded.max()+" backend="+loaded.backend()
+                            +" weapon-rules="+loaded.weapons().size()+" recipes="+craftingLoaded.recipes().size());
                     sync.close();for(Player p:Bukkit.getOnlinePlayers())sync.request(p);
                 }catch(Exception e){getLogger().log(Level.SEVERE,"StarForge apply failed",e);if(menus==null)getServer().getPluginManager().disablePlugin(this);}finally{loading.set(false);}});
             }catch(Exception e){getLogger().log(Level.SEVERE,"StarForge config load failed; previous settings retained",e);loading.set(false);}
         });
     }
     private void start(){
+        recipeUnlocks.harvestMilestones(ym.starforge.crafting.FarmRecipeRequirement.connect(this));
+        stationAnimations=new ym.starforge.workstation.StationAnimations(this,stationOrigins,()->stationSettings);
+        getServer().getPluginManager().registerEvents(stationAnimations,this);
+        if(getServer().getPluginManager().isPluginEnabled("CraftEngine"))
+            getServer().getPluginManager().registerEvents(new CeStationOrigins(this,stationOrigins),this);
         weapons=new WeaponService(()->settings);var texts=new Texts(()->settings);var materials=new MaterialItems(()->settings);
         log=new OperationLog(getDataFolder().toPath(),getLogger());transaction=new ForgeTransaction(this,()->settings,weapons,materials,texts,log);
-        menus=new ForgeMenus(this,()->settings,weapons,transaction,texts);getServer().getPluginManager().registerEvents(menus,this);sync=new EquipmentSync(this,weapons,()->placeholders);getServer().getPluginManager().registerEvents(sync,this);
+        menus=new ForgeMenus(this,()->settings,weapons,transaction,texts,stationOrigins,stationAnimations);getServer().getPluginManager().registerEvents(menus,this);sync=new EquipmentSync(this,weapons,()->placeholders);getServer().getPluginManager().registerEvents(sync,this);
         getServer().getServicesManager().register(StarForgeApi.class,weapons,this,ServicePriority.Normal);
         if(getServer().getPluginManager().isPluginEnabled("ItemHub"))hub=HubBridge.register(this,weapons);
         if(getServer().getPluginManager().isPluginEnabled("PlaceholderAPI")){placeholders=PapiBridge.create();}
-        craftingMenu=new ym.starforge.crafting.CraftingMenu(this,()->craftingConfig,craftingOrders,texts);getServer().getPluginManager().registerEvents(craftingMenu,this);
-        var cmd=new ForgeCommand(this,menus,materials,weapons,texts,this::reload,()->settings.max(),p->craftingMenu.open(p));getCommand("starforge").setExecutor(cmd);getCommand("starforge").setTabCompleter(cmd);
+        craftingMenu=new ym.starforge.crafting.CraftingMenu(this,()->craftingConfig,craftingOrders,texts,recipeUnlocks,stationOrigins,stationAnimations);getServer().getPluginManager().registerEvents(craftingMenu,this);
+        getLogger().info("Item crafting enabled recipes="+craftingConfig.recipes().size()+" unlock-schema=1 ui=chest");
+        var cmd=new ForgeCommand(this,menus,materials,weapons,texts,this::reload,()->settings.max(),craftingMenu::open,new ym.starforge.command.RecipeCommand(this,()->craftingConfig,recipeUnlocks,texts));getCommand("starforge").setExecutor(cmd);getCommand("starforge").setTabCompleter(cmd);
     }
-    public void onDisable(){if(craftingMenu!=null)craftingMenu.close();if(craftingOrders!=null)craftingOrders.close();if(sync!=null)sync.close();if(menus!=null)menus.close();if(transaction!=null)transaction.close();if(hub!=null)try{hub.close();}catch(Exception e){getLogger().log(Level.SEVERE,"Close ItemHub registration",e);}if(placeholders!=null){placeholders.close();}getServer().getServicesManager().unregisterAll(this);Bukkit.getAsyncScheduler().cancelTasks(this);Bukkit.getGlobalRegionScheduler().cancelTasks(this);if(log!=null)log.close();}
+    public void onDisable(){if(stationHammers!=null)stationHammers.close();if(stationAnimations!=null)stationAnimations.close();if(recipeUnlocks!=null)recipeUnlocks.close();if(craftingMenu!=null)craftingMenu.close();if(craftingOrders!=null)craftingOrders.close();if(sync!=null)sync.close();if(menus!=null)menus.close();if(transaction!=null)transaction.close();if(hub!=null)try{hub.close();}catch(Exception e){getLogger().log(Level.SEVERE,"Close ItemHub registration",e);}if(placeholders!=null){placeholders.close();}getServer().getServicesManager().unregisterAll(this);Bukkit.getAsyncScheduler().cancelTasks(this);Bukkit.getGlobalRegionScheduler().cancelTasks(this);if(log!=null)log.close();}
 }

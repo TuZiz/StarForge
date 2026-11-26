@@ -1,10 +1,39 @@
 schema-version: 1
+# 每位玩家最多保留的未领取订单数（1～54）；包括制作中、完成未领取和处理中。
+max-active-orders: 6
 # duration-seconds 为制作耗时（秒），离线和重启期间继续计时。
-# 同配方同时一单，cooldown-group 非空时组内共用一个制作位置，领取后释放。
+# 同配方可同时制作多单，每次确认一份，各单独立计时和领取。
+# cooldown-group 非空时，仍限制该玩家组内一个订单，领取后释放。
 # 产物在提交时保存快照，修改配方不影响已有订单。
+# category 对应 gui/crafting-types.yml 入口的品类 ID。新增配方和入口后运行 /sf reload。
 recipes:
-  iron_sword:
-    name: '<#FBBF24>铁剑锻造'
+  fuel_press: # 燃料压制机
+    name: '<#E8BA7A>燃料压制机'
+    default-unlocked: false
+    required-harvest: 'golden_rice' # 自家菜地首次成功收获金穗稻
+    category: 'machines'
+    money: 0
+    duration-seconds: 30
+    cooldown-group: ''
+    ingredients:
+      - source: 'craft-engine'
+        id: 'genlite:mechanical_parts' # 铁片
+        amount: 4
+      - source: 'craft-engine'
+        id: 'genlite:gear' # 铁环
+        amount: 1
+      - source: 'craft-engine'
+        id: 'genlite:machine_frame' # 铁架
+        amount: 1
+    result:
+      source: 'craft-engine'
+      id: 'genlite:fuel_press' # 燃料压制机
+      amount: 1
+  star_sword:
+    name: '<#FBBF24>试作星辉长剑'
+    # 管理员通过 /sf recipe unlock 玩家 star_sword 授予，未学习时隐藏。
+    default-unlocked: false
+    category: 'weapons'
     money: 100
     duration-seconds: 60
     cooldown-group: ''
@@ -16,6 +45,78 @@ recipes:
         id: 'starforge:intermediate_stone'
         amount: 2
     result:
-      source: 'vanilla'
-      id: 'IRON_SWORD'
+      source: 'itemhub'
+      id: '星锻测试:试作长剑'
+      amount: 1
+  aster_head:
+    name: '<#A8E6A3>星芽护额'
+    default-unlocked: true
+    category: 'weapons'
+    money: 0
+    duration-seconds: 30
+    cooldown-group: ''
+    ingredients:
+      - source: 'craft-engine'
+        id: 'genlite:mechanical_parts'
+        amount: 2
+      - source: 'craft-engine'
+        id: 'genlite:gear'
+        amount: 1
+    result:
+      source: 'itemhub'
+      id: '星芽:护额'
+      amount: 1
+  aster_chest:
+    name: '<#A8E6A3>星芽轻甲'
+    default-unlocked: true
+    category: 'weapons'
+    money: 0
+    duration-seconds: 30
+    cooldown-group: ''
+    ingredients:
+      - source: 'craft-engine'
+        id: 'genlite:mechanical_parts'
+        amount: 3
+      - source: 'craft-engine'
+        id: 'genlite:gear'
+        amount: 2
+    result:
+      source: 'itemhub'
+      id: '星芽:轻甲'
+      amount: 1
+  aster_legs:
+    name: '<#A8E6A3>星芽护腿'
+    default-unlocked: true
+    category: 'weapons'
+    money: 0
+    duration-seconds: 30
+    cooldown-group: ''
+    ingredients:
+      - source: 'craft-engine'
+        id: 'genlite:mechanical_parts'
+        amount: 2
+      - source: 'craft-engine'
+        id: 'genlite:gear'
+        amount: 2
+    result:
+      source: 'itemhub'
+      id: '星芽:护腿'
+      amount: 1
+  aster_feet:
+    name: '<#A8E6A3>星芽短靴'
+    default-unlocked: true
+    category: 'weapons'
+    money: 0
+    duration-seconds: 30
+    cooldown-group: ''
+    ingredients:
+      - source: 'craft-engine'
+        id: 'genlite:mechanical_parts'
+        amount: 1
+      - source: 'craft-engine'
+        id: 'genlite:gear'
+        amount: 1
+    result:
+      source: 'itemhub'
+      id: '星芽:短靴'
       amount: 1

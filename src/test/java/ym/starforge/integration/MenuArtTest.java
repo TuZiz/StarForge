@@ -22,4 +22,16 @@ class MenuArtTest {
         check(combined);
     }
     private void check(Component component){assertEquals(TextDecoration.State.FALSE,component.decoration(TextDecoration.ITALIC));component.children().forEach(this::check);}
+    @Test void dynamicWeaponNameCannotInheritBackgroundOffsetFont(){
+        var name=Component.text("星芽短剑 +1").append(Component.text("✦").font(Key.key("itemhub:icons")));
+        var text=Component.text("星锻强化 ").font(Key.key("starforge:ui"));
+        var title=Component.empty().append(text).append(name);
+        var result=MenuArt.compose(Component.empty(),title);
+        var body=result.children().getLast();
+        assertEquals(Key.key("minecraft:default"),body.font());
+        assertEquals(Key.key("starforge:ui"),body.children().get(0).font());
+        assertNull(body.children().get(1).font());
+        assertEquals(Key.key("itemhub:icons"),body.children().get(1).children().get(0).font());
+        check(result);
+    }
 }

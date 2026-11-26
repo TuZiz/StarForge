@@ -1,0 +1,42 @@
+schema-version: 1
+background-image: 'starforge:craft_types_six'
+title: '<font:starforge:ui><#EAD6AF>    配方图鉴</font>'
+# 在 shape 放入新元素的字符，并用 action: 'category' + category 指向 recipes.yml 的同名品类。
+# 品类 ID 可用小写字母、数字、下划线及连字符。装备与机器占用前两张卡。
+# 自定义两行三列品类卡可用 locked-card-model 指定 52×36 的锁定 ItemModel。
+shape:
+  - 'EEEMMMFFF'
+  - 'EEEMMMFFF'
+  - 'FFFFFFFFF'
+  - 'FFFFFFFFF'
+  - 'FFFBBBTTT'
+elements:
+  F:
+    action: 'none'
+    name: ''
+  E:
+    action: 'category'
+    category: 'weapons' # 装备
+    craft-engine: 'starforge:gui_blank'
+    name: '<#EAD6AF>装备'
+    lore:
+      - '<#94A3B8>查看已解锁的装备配方'
+  M:
+    action: 'category'
+    category: 'machines' # 机器
+    craft-engine: 'starforge:gui_blank'
+    name: '<#EAD6AF>机器'
+    lore:
+      - '<#C9D3DC>查看机器配方与解锁条件'
+  T:
+    action: 'orders'
+    craft-engine: 'starforge:gui_blank'
+    name: '<#EAD6AF>我的锻造'
+    lore:
+      - '<#94A3B8>查看进度与领取成品'
+  B:
+    action: 'close'
+    craft-engine: 'starforge:gui_blank'
+    name: '<#EAD6AF>返回'
+    lore:
+      - '<#94A3B8>返回游戏'

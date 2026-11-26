@@ -1,0 +1,42 @@
+{
+  "hammer_1": {
+    "sounds": [
+      {
+        "name": "starforge_workstations:hammer_1",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "hammer_2": {
+    "sounds": [
+      {
+        "name": "starforge_workstations:hammer_2",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "hammer_3": {
+    "sounds": [
+      {
+        "name": "starforge_workstations:hammer_3",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "hammer_4": {
+    "sounds": [
+      {
+        "name": "starforge_workstations:hammer_4",
+        "attenuation_distance": 12
+      }
+    ]
+  },
+  "claim": {
+    "sounds": [
+      {
+        "name": "starforge_workstations:claim",
+        "attenuation_distance": 12
+      }
+    ]
+  }
+}

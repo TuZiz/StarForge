@@ -1,0 +1,1 @@
+{"gui_light":"front","textures":{"art":"starforge:item/crafting/unlock/cards","particle":"starforge:item/crafting/unlock/cards"},"elements":[{"from":[-5,-6,8],"to":[21,12,8.01],"shade":false,"faces":{"south":{"uv":[8.0,0.0,14.5,4.5],"texture":"#art"},"north":{"uv":[14.5,0.0,8.0,4.5],"texture":"#art"}}}],"display":{"gui":{"rotation":[0,0,0],"translation":[0,0,0],"scale":[2,2,1]}}}

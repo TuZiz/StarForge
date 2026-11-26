@@ -1,0 +1,243 @@
+schema-version: 1
+# 原生多格模型约3×2格；台体统一等比scale=1，不再拉伸旧模型。
+furniture:
+  starforge:enhancement_station:
+    settings:
+      item: 'starforge:enhancement_station'
+      hit_times: 3
+      sounds:
+        place: 'minecraft:block.anvil.place'
+        break: 'minecraft:block.anvil.break'
+        hit: 'minecraft:block.anvil.hit'
+    events:
+      - on: 'right_click'
+        conditions:
+          - type: 'hand'
+            hand: 'main_hand'
+          - type: 'test_flag'
+            flag: 'interact'
+        functions:
+          - type: 'update_interaction_tick'
+          - type: 'command'
+            as_player: true
+            as_op: false
+            commands:
+              - 'starforge:starforge'
+    variants:
+      ground:
+        loot_spawn_offset: 0,0.25,0
+        elements:
+          - type: 'item_display'
+            item: 'starforge:enhancement_station'
+            display_transform: 'none'
+            billboard: 'fixed'
+            position: 0,0.5,0
+            scale: 1,1,1
+          # 名称框与名字独立显示；只改 text 即可改名，不用重烘焙模型。
+          - type: 'item_display'
+            item: 'starforge:enhancement_nameplate'
+            display_transform: 'none'
+            billboard: 'center'
+            position: 0,2.6,0
+            scale: 1,1,1
+            brightness:
+              block: 15
+              sky: 15
+          - type: 'text_display'
+            text: '<font:starforge:workstations/title><#A4ECF2>强化台</font>'
+            billboard: 'center'
+            position: 0,2.6,0
+            translation: 0,-0.16,0.05
+            scale: 1.1,1.1,1.1
+            alignment: 'center'
+            line_width: 200
+            background_color: 0
+            use_default_background_color: false
+            text_opacity: -1
+            has_shadow: false
+            is_see_through: false
+            brightness:
+              block: 15
+              sky: 15
+        # 两排三列交互区，覆盖原生多格台体；不是物理碰撞箱。
+        hitboxes:
+          - type: 'interaction'
+            position: -1,0,-0.5
+            width: 1.0
+            height: 1.93
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+          - type: 'interaction'
+            position: -1,0,0.5
+            width: 1.0
+            height: 1.93
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+          - type: 'interaction'
+            position: 0,0,-0.5
+            width: 1.0
+            height: 1.93
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+          - type: 'interaction'
+            position: 0,0,0.5
+            width: 1.0
+            height: 1.93
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+          - type: 'interaction'
+            position: 1,0,-0.5
+            width: 1.0
+            height: 1.93
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+          - type: 'interaction'
+            position: 1,0,0.5
+            width: 1.0
+            height: 1.93
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+    loot:
+      pools:
+        - rolls: 1
+          entries:
+            - type: 'furniture_item'
+              item: 'starforge:enhancement_station'
+  starforge:crafting_station:
+    settings:
+      item: 'starforge:crafting_station'
+      hit_times: 3
+      sounds:
+        place: 'minecraft:block.anvil.place'
+        break: 'minecraft:block.anvil.break'
+        hit: 'minecraft:block.anvil.hit'
+    events:
+      - on: 'right_click'
+        conditions:
+          - type: 'hand'
+            hand: 'main_hand'
+          - type: 'test_flag'
+            flag: 'interact'
+        functions:
+          - type: 'update_interaction_tick'
+          - type: 'command'
+            as_player: true
+            as_op: false
+            commands:
+              - 'starforge:starforge craft'
+    variants:
+      ground:
+        loot_spawn_offset: 0,0.25,0
+        elements:
+          - type: 'item_display'
+            item: 'starforge:crafting_station'
+            display_transform: 'none'
+            billboard: 'fixed'
+            position: 0,0.5,0
+            scale: 1,1,1
+          # 名称框与名字独立显示；只改 text 即可改名，不用重烘焙模型。
+          - type: 'item_display'
+            item: 'starforge:crafting_nameplate'
+            display_transform: 'none'
+            billboard: 'center'
+            position: 0,2.6,0
+            scale: 1,1,1
+            brightness:
+              block: 15
+              sky: 15
+          - type: 'text_display'
+            text: '<font:starforge:workstations/title><#FFD29B>锻造台</font>'
+            billboard: 'center'
+            position: 0,2.6,0
+            translation: 0,-0.16,0.05
+            scale: 1.1,1.1,1.1
+            alignment: 'center'
+            line_width: 200
+            background_color: 0
+            use_default_background_color: false
+            text_opacity: -1
+            has_shadow: false
+            is_see_through: false
+            brightness:
+              block: 15
+              sky: 15
+        # 两排三列交互区，覆盖原生多格台体；不是物理碰撞箱。
+        hitboxes:
+          - type: 'interaction'
+            position: -1,0,-0.5
+            width: 1.0
+            height: 1.98
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+          - type: 'interaction'
+            position: -1,0,0.5
+            width: 1.0
+            height: 1.98
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+          - type: 'interaction'
+            position: 0,0,-0.5
+            width: 1.0
+            height: 1.98
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+          - type: 'interaction'
+            position: 0,0,0.5
+            width: 1.0
+            height: 1.98
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+          - type: 'interaction'
+            position: 1,0,-0.5
+            width: 1.0
+            height: 1.98
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+          - type: 'interaction'
+            position: 1,0,0.5
+            width: 1.0
+            height: 1.98
+            interactive: true
+            invisible: false
+            blocks_building: true
+            can_use_item_on: false
+            can_be_hit_by_projectile: false
+    loot:
+      pools:
+        - rolls: 1
+          entries:
+            - type: 'furniture_item'
+              item: 'starforge:crafting_station'

@@ -1,0 +1,11 @@
+schema-version: 1
+
+# 控制 CE 实体工作台上的制作锤击与结果展示。
+animation:
+  enabled: true
+  # 结果展示时长，单位 tick，范围 10～100。重锤每 61 tick 循环四击。
+  duration-ticks: 30
+  # 强化装备升起的高度，单位格，范围 0.2～2；锻造成品抽出后升起此高度的 48%。
+  rise-height: 0.9
+  # 触发结果展示的最远距离，也是制作中重锤寻找附近观众的半径，单位格，范围 2～16。
+  max-distance: 8
